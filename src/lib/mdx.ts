@@ -25,7 +25,7 @@ export function getAllBlogSlugs() {
   }
 }
 
-export function getBlogBySlug(slug: string): BlogPost | undefined {
+export async function getBlogBySlug(slug: string): Promise<BlogPost | undefined> {
   try {
     // First try with the exact slug
     let fullPath = path.join(contentDirectory, `${slug}.mdx`);
@@ -67,7 +67,7 @@ export function getBlogBySlug(slug: string): BlogPost | undefined {
   }
 }
 
-export function getAllBlogs(): BlogPost[] {
+export async function getAllBlogs(): Promise<BlogPost[]> {
   const fileNames = fs.readdirSync(contentDirectory);
   const allBlogsData = fileNames.map((fileName) => {
     const fullPath = path.join(contentDirectory, fileName);
@@ -96,6 +96,7 @@ export function getAllBlogs(): BlogPost[] {
   });
 }
 
-export function getRecentBlogs(count = 5) {
-  return getAllBlogs().slice(0, count);
+export async function getRecentBlogs(count = 5): Promise<BlogPost[]> {
+  const blogs = await getAllBlogs();
+  return blogs.slice(0, count);
 }

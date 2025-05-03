@@ -30,8 +30,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
-  const recentPosts = getRecentBlogs(5);
+export default async function Home() {
+  const recentPosts = await getRecentBlogs(5);
 
   return (
     <main>

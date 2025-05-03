@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
     // !! WARN !!
     ignoreBuildErrors: true,
   },
+  experimental: {
+    // Enable the experimental appDir feature
+    appDir: true,
+  },
 };
 
 export default nextConfig;

@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogPage() {
-  const allPosts = getAllBlogs();
+export default async function BlogPage() {
+  const allPosts = await getAllBlogs();
 
   return (
     <main>

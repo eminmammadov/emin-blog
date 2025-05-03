@@ -9,7 +9,9 @@ import { getFullUrl } from '@/lib/utils';
 
 // Dynamic metadata generation for each blog post
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = getBlogBySlug(params.slug);
+  // Next.js 15.3.1 requires awaiting params object itself
+  const resolvedParams = await params;
+  const post = await getBlogBySlug(resolvedParams.slug);
 
   if (!post) {
     return {
@@ -30,7 +32,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       publishedTime: post.date,
       authors: [post.author],
       tags: post.categories,
-      url: getFullUrl(`/blog/${params.slug}`),
+      url: getFullUrl(`/blog/${resolvedParams.slug}`),
       images: [
         {
           url: getFullUrl('/images/og-image.jpg'),
@@ -50,14 +52,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export async function generateStaticParams() {
-  const blogs = getAllBlogs();
+  const blogs = await getAllBlogs();
   return blogs.map((blog) => ({
     slug: blog.slug,
   }));
 }
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = getBlogBySlug(params.slug);
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  // Next.js 15.3.1 requires awaiting params object itself
+  const resolvedParams = await params;
+  const post = await getBlogBySlug(resolvedParams.slug);
 
   if (!post) {
     notFound();
