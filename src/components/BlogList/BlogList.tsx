@@ -22,7 +22,7 @@ export default function BlogList({
         <thead>
           <tr className={styles.tableHeader}>
             <th className={styles.dateHeader}>/ TARİXÇƏ</th>
-            <th className={styles.nameHeader}>/ YAZILAR</th>
+            <th className={styles.nameHeader}>/ MƏQALƏLƏR</th>
             <th className={styles.typeHeader}>/ KATEQORİYA</th>
             <th className={styles.actionHeader} />
           </tr>

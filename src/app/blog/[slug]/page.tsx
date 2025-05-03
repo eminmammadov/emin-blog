@@ -28,11 +28,11 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           <h2 className={styles.sectionTitle}>/ METADATA</h2>
           <div className={styles.metadataGrid}>
             <div className={styles.metadataItem}>
-              <div className={styles.metadataLabel}>DATE:</div>
+              <div className={styles.metadataLabel}>TARİXÇƏ:</div>
               <div className={styles.metadataValue}>{post.date}</div>
             </div>
             <div className={styles.metadataItem}>
-              <div className={styles.metadataLabel}>KATEQORİY:</div>
+              <div className={styles.metadataLabel}>KATEQORİYA:</div>
               <div className={styles.metadataValue}>{post.categories.join(', ')}</div>
             </div>
             <div className={styles.metadataItem}>
@@ -50,7 +50,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         </div>
 
         <div className={styles.articleSection}>
-          <h2 className={styles.sectionTitle}>/ ARTICLE</h2>
+          <h2 className={styles.sectionTitle}>/ MƏQALƏ</h2>
           <div className={styles.articleContent}>
             <MDXRemote source={post.content} />
             <div>
