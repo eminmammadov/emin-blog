@@ -2,6 +2,7 @@ import React from 'react';
 import { getAllBlogs } from '@/lib/mdx';
 import BlogList from '@/components/BlogList';
 import type { Metadata } from 'next';
+import { getFullUrl } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Tüm Yazılar',
@@ -9,9 +10,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Tüm Yazılar | Emin Blog',
     description: 'Blockchain ve sistem memarlığı hakkında tüm blog yazılarımızı keşfedin.',
+    url: getFullUrl('/blog'),
     images: [
       {
-        url: '/images/og-image.jpg',
+        url: getFullUrl('/images/og-image.jpg'),
         width: 1200,
         height: 630,
         alt: 'Emin Blog - Tüm Yazılar',
@@ -22,7 +24,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Tüm Yazılar | Emin Blog',
     description: 'Blockchain ve sistem memarlığı hakkında tüm blog yazılarımızı keşfedin.',
-    images: ['/images/og-image.jpg'],
+    images: [getFullUrl('/images/og-image.jpg')],
   },
 };
 

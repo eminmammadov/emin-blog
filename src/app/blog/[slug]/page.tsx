@@ -5,6 +5,7 @@ import styles from './blogPost.module.css';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import type { Metadata } from 'next';
+import { getFullUrl } from '@/lib/utils';
 
 // Dynamic metadata generation for each blog post
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -29,9 +30,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       publishedTime: post.date,
       authors: [post.author],
       tags: post.categories,
+      url: getFullUrl(`/blog/${params.slug}`),
       images: [
         {
-          url: '/images/og-image.jpg',
+          url: getFullUrl('/images/og-image.jpg'),
           width: 1200,
           height: 630,
           alt: post.title,
@@ -42,7 +44,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
-      images: ['/images/og-image.jpg'],
+      images: [getFullUrl('/images/og-image.jpg')],
     },
   };
 }
@@ -80,10 +82,10 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
             <div className={styles.metadataItem}>
               <div className={styles.metadataLabel}>PAYLAŞ:</div>
               <div className={styles.shareButtons}>
-                <Link href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://example.com/blog/${post.slug}`)}`} target="_blank" className={styles.shareButton}>
+                <Link href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_SITE_URL}/blog/${post.slug}`)}`} target="_blank" className={styles.shareButton}>
                   X/Twitter
                 </Link>
-                <Link href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://example.com/blog/${post.slug}`)}`} target="_blank" className={styles.shareButton}>
+                <Link href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${process.env.NEXT_PUBLIC_SITE_URL}/blog/${post.slug}`)}`} target="_blank" className={styles.shareButton}>
                   LinkedIn
                 </Link>
               </div>

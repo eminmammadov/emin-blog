@@ -4,6 +4,7 @@ import { getRecentBlogs } from '@/lib/mdx';
 import Link from 'next/link';
 import styles from './styles.module.css';
 import type { Metadata } from 'next';
+import { getFullUrl } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Ana Sayfa',
@@ -11,9 +12,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
     description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
+    url: getFullUrl('/'),
     images: [
       {
-        url: '/images/og-image.jpg',
+        url: getFullUrl('/images/og-image.jpg'),
         width: 1200,
         height: 630,
         alt: 'Emin Blog - Ana Sayfa',
@@ -24,7 +26,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
     description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
-    images: ['/images/og-image.jpg'],
+    images: [getFullUrl('/images/og-image.jpg')],
   },
 };
 
