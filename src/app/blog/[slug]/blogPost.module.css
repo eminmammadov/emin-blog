@@ -1,0 +1,249 @@
+.blogPostContainer {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 30px 16px;
+}
+
+.blogPostContent {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+}
+
+.blogPostTitle {
+  grid-column: 1 / -1;
+  font-size: 6rem;
+  font-weight: 500;
+  line-height: 1;
+  margin-bottom: 60px;
+  color: var(--black);
+  letter-spacing: -0.08em;
+  max-width: 1500px;
+}
+
+.sectionTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #000;
+  padding-bottom: 8px;
+}
+
+.metadataSection {
+  grid-column: 1 / 2;
+  background-color: #f8f9f7;
+  max-width: 400px;
+}
+
+.metadataGrid {
+  display: flex;
+  flex-direction: column;
+}
+
+.metadataItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dotted #ccc;
+  padding-bottom: 4px;
+  margin-top: 4px;
+}
+
+.metadataLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+  width: 120px;
+  text-align: left;
+}
+
+.metadataValue {
+  font-size: 0.875rem;
+  color: var(--black);
+  flex: 1;
+  text-align: right;
+  font-weight: 500;
+}
+
+.shareButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.shareButton {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: transparent;
+  border: 1px solid #333;
+  font-size: 0.875rem;
+  color: var(--black);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  width: 48%;
+}
+
+.shareButton:hover {
+  background-color: #e0e0e0;
+}
+
+.articleSection {
+  grid-column: 2 / 3;
+}
+
+.articleContent {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--black);
+}
+
+.articleContent h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 32px 0 16px;
+}
+
+.articleContent h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 24px 0 16px;
+}
+
+.articleContent h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 20px 0 12px;
+}
+
+.articleContent p {
+  margin-bottom: 24px;
+}
+
+.articleContent ul {
+  margin-bottom: 24px;
+  padding-left: 24px;
+  list-style-type: disc;
+}
+
+.articleContent ol {
+  margin-bottom: 24px;
+  padding-left: 24px;
+}
+
+.articleContent li {
+  margin-bottom: 8px;
+}
+
+.articleContent a {
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.articleContent a:hover {
+  text-decoration: underline;
+}
+
+.articleContent blockquote {
+  border-left: 4px solid #e0e0e0;
+  padding-left: 16px;
+  margin-left: 0;
+  margin-right: 0;
+  font-style: italic;
+}
+
+.articleContent code {
+  background-color: #f5f5f5;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.articleContent pre {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 24px;
+}
+
+.articleContent pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.articleContent img {
+  max-width: 100%;
+  height: auto;
+  margin: 24px 0;
+}
+
+.articleContent hr {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 32px 0;
+}
+
+.backButton {
+  display: inline-block;
+  margin-top: 40px;
+  padding: 5px 10px;
+  border: 1px solid var(--black);
+  font-size: 0.875rem;
+  color: var(--black) !important;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.backButton:hover {
+  background-color: var(--foreground);
+  text-decoration: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .blogPostContainer {
+    padding: 30px 16px;
+  }
+
+  .blogPostContent {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .blogPostTitle {
+    font-size: 3rem;
+    margin-bottom: 40px;
+  }
+
+  .metadataSection {
+    grid-column: 1 / -1;
+    max-width: 100%;
+  }
+
+  .articleSection {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .blogPostContainer {
+    padding: 30px 16px;
+  }
+
+  .blogPostTitle {
+    font-size: 2.25rem;
+    margin-bottom: 32px;
+  }
+
+  .articleContent {
+    font-size: 1rem;
+  }
+
+  .articleContent h2 {
+    font-size: 1.5rem;
+  }
+}

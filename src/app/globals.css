@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+:root {
+  --black: #1E1E1E;
+  --background: #F7F7F3;
+  --foreground: #E6E9E4;
+  --hover: #76F0B9;
+  --active: #f350b7;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--black);
+  font-family: var(--font-dm-sans), sans-serif;
+}
