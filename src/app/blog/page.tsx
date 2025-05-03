@@ -1,6 +1,30 @@
 import React from 'react';
 import { getAllBlogs } from '@/lib/mdx';
 import BlogList from '@/components/BlogList';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Tüm Yazılar',
+  description: 'Blockchain ve sistem memarlığı hakkında tüm blog yazılarımızı keşfedin.',
+  openGraph: {
+    title: 'Tüm Yazılar | Emin Blog',
+    description: 'Blockchain ve sistem memarlığı hakkında tüm blog yazılarımızı keşfedin.',
+    images: [
+      {
+        url: '/images/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Emin Blog - Tüm Yazılar',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Tüm Yazılar | Emin Blog',
+    description: 'Blockchain ve sistem memarlığı hakkında tüm blog yazılarımızı keşfedin.',
+    images: ['/images/og-image.jpg'],
+  },
+};
 
 export default function BlogPage() {
   const allPosts = getAllBlogs();

@@ -4,6 +4,48 @@ import Link from 'next/link';
 import styles from './blogPost.module.css';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import type { Metadata } from 'next';
+
+// Dynamic metadata generation for each blog post
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const post = getBlogBySlug(params.slug);
+
+  if (!post) {
+    return {
+      title: 'Blog Yazısı Bulunamadı',
+      description: 'Aradığınız blog yazısı bulunamadı.',
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    authors: [{ name: post.author }],
+    keywords: [...post.categories, 'blog', 'Emin Blog'],
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: 'article',
+      publishedTime: post.date,
+      authors: [post.author],
+      tags: post.categories,
+      images: [
+        {
+          url: '/images/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: ['/images/og-image.jpg'],
+    },
+  };
+}
 
 export async function generateStaticParams() {
   const blogs = getAllBlogs();

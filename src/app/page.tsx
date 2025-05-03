@@ -3,6 +3,30 @@ import BlogList from '@/components/BlogList';
 import { getRecentBlogs } from '@/lib/mdx';
 import Link from 'next/link';
 import styles from './styles.module.css';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Ana Sayfa',
+  description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
+  openGraph: {
+    title: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
+    description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
+    images: [
+      {
+        url: '/images/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Emin Blog - Ana Sayfa',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
+    description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
+    images: ['/images/og-image.jpg'],
+  },
+};
 
 export default function Home() {
   const recentPosts = getRecentBlogs(5);
