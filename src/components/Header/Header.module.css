@@ -1,5 +1,10 @@
 .header {
   padding: 8px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: var(--background);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .container {
@@ -84,10 +89,14 @@
 
 .mobileMenu {
   display: none;
-  margin-top: 8px;
-  padding: 8px 0;
+  margin-top: 6px;
+  padding: 8px 16px;
   background-color: var(--background);
   border-top: 1px solid rgba(30, 30, 30, 0.1);
+  position: absolute;
+  width: 100%;
+  left: 0;
+  z-index: 1001;
 }
 
 @media (max-width: 640px) {
