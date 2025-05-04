@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   /* config options here */
   typescript: {
     // !! WARN !!
@@ -10,7 +9,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   // In Next.js 15.3.1, appDir is no longer experimental and is enabled by default
-  // Remove the experimental.appDir option
 };
 
-export default nextConfig;
+module.exports = nextConfig;

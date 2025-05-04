@@ -84,6 +84,7 @@
   transition: background-color 0.2s ease;
   text-align: center;
   width: 48%;
+  cursor: pointer;
 }
 
 .shareButton:hover {

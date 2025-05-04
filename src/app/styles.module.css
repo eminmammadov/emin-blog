@@ -16,3 +16,23 @@
 .viewAllButton:hover {
   background-color: var(--foreground);
 }
+
+.errorContainer {
+  text-align: center;
+  padding: 40px 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  background-color: var(--background);
+  border: 1px solid #e0e0e0;
+}
+
+.errorContainer h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: var(--black);
+}
+
+.errorContainer p {
+  font-size: 1rem;
+  color: #666;
+}

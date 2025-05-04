@@ -4,6 +4,9 @@ import BlogList from '@/components/BlogList';
 import type { Metadata } from 'next';
 import { getFullUrl } from '@/lib/utils';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Bütün Yazılar',
   description: 'Blockchain ve sistem memarlığı haqqında bütün blog yazılarımızı kəşfedin.',
@@ -29,14 +32,39 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const allPosts = await getAllBlogs();
+  try {
+    console.log('Fetching all blogs for blog page...');
+    const allPosts = await getAllBlogs();
+    console.log(`Fetched ${allPosts.length} posts for blog page`);
 
-  return (
-    <main>
-      <BlogList
-        posts={allPosts}
-        title="Bütün bloq yazıları"
-      />
-    </main>
-  );
+    return (
+      <main>
+        <BlogList
+          posts={allPosts}
+          title="Bütün bloq yazıları"
+        />
+      </main>
+    );
+  } catch (error) {
+    console.error('Error rendering blog page:', error);
+    return (
+      <main>
+        <div style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          margin: '20px auto',
+          maxWidth: '600px',
+          backgroundColor: 'var(--background)',
+          border: '1px solid #e0e0e0'
+        }}>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>
+            Blog yazıları yüklenirken bir hata oluştu
+          </h2>
+          <p style={{ fontSize: '1rem', color: '#666' }}>
+            Lütfen daha sonra tekrar deneyin.
+          </p>
+        </div>
+      </main>
+    );
+  }
 }

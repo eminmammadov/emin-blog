@@ -107,12 +107,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.variable} antialiased`}
+        className={`${dmSans.variable} antialiased flex flex-col min-h-screen`}
         data-new-gr-c-s-check-loaded="14.1233.0"
         data-gr-ext-installed=""
       >
         <Header />
-        {children}
+        <main className="flex-grow">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

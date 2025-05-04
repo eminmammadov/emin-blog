@@ -42,8 +42,8 @@ export default function BlogList({
                   {post.date}
                 </Link>
                 <Link href={`/blog/${post.slug}`} className={`${styles.blogLink} ${styles.mobileTypeTag}`}>
-                  <span className={`${styles.typeTag} ${styles[post.type.toLowerCase()]}`}>
-                    {post.type}
+                  <span className={styles.typeTag}>
+                    {post.category}
                   </span>
                 </Link>
               </td>
@@ -54,8 +54,8 @@ export default function BlogList({
               </td>
               <td className={styles.typeCell}>
                 <Link href={`/blog/${post.slug}`} className={styles.blogLink}>
-                  <span className={`${styles.typeTag} ${styles[post.type.toLowerCase()]}`}>
-                    {post.type}
+                  <span className={styles.typeTag}>
+                    {post.category}
                   </span>
                 </Link>
               </td>

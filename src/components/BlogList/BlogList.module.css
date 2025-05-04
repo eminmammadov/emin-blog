@@ -165,7 +165,7 @@
 
   /* Change the display of table and rows */
   .blogTable {
-    display: block;
+    /* display: block; */
     border-top: 1px solid var(--black);
   }
 
@@ -178,6 +178,7 @@
 
   /* Style all cells */
   .blogRow td {
+
     display: flex;
     padding: 0;
     border: none;

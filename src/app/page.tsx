@@ -6,6 +6,9 @@ import styles from './styles.module.css';
 import type { Metadata } from 'next';
 import { getFullUrl } from '@/lib/utils';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Əsas Səhifə',
   description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
@@ -31,18 +34,36 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const recentPosts = await getRecentBlogs(5);
+  try {
+    console.log('Fetching recent blogs for homepage...');
+    const recentPosts = await getRecentBlogs(5);
+    console.log(`Fetched ${recentPosts.length} recent posts for homepage`);
 
-  return (
-    <main>
-      <Hero />
-      <BlogList
-        posts={recentPosts}
-        limit={5}
-      />
-      <Link href="/blog" className={styles.viewAllButton}>
-        Bütün Bloqlar
-      </Link>
-    </main>
-  );
+    return (
+      <main>
+        <Hero />
+        <BlogList
+          posts={recentPosts}
+          limit={5}
+        />
+        <Link href="/blog" className={styles.viewAllButton}>
+          Bütün Bloqlar
+        </Link>
+      </main>
+    );
+  } catch (error) {
+    console.error('Error rendering homepage:', error);
+    return (
+      <main>
+        <Hero />
+        <div className={styles.errorContainer}>
+          <h2>Blog yazıları yüklenirken bir hata oluştu</h2>
+          <p>Lütfen daha sonra tekrar deneyin.</p>
+        </div>
+        <Link href="/blog" className={styles.viewAllButton}>
+          Bütün Bloqlar
+        </Link>
+      </main>
+    );
+  }
 }
