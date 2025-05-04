@@ -7,7 +7,7 @@ import type { Metadata } from 'next';
 import { getFullUrl } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Ana Sayfa',
+  title: 'Əsas Səhifə',
   description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
   openGraph: {
     title: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
         url: getFullUrl('/images/og-image.jpg'),
         width: 1200,
         height: 630,
-        alt: 'Emin Blog - Ana Sayfa',
+        alt: 'Emin Blog - Əsas Səhifə',
       },
     ],
   },

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
   keywords: ['blockchain', 'sistem memarlığı', 'texnologiya', 'blog', 'Emin'],
-  authors: [{ name: 'Emin', url: 'https://github.com/eminmammadov' }],
+  authors: [{ name: 'Emin', url: 'https://x.com/eminmammadov' }],
   creator: 'Emin',
   publisher: 'Emin Blog',
   formatDetection: {
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
     url: 'https://example.com',
     siteName: 'Emin Blog',
-    locale: 'tr_TR',
+    locale: 'az_AZ',
     type: 'website',
     images: [
       {

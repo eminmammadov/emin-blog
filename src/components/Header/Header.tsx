@@ -12,7 +12,7 @@ export default function Header() {
 
   // Define navigation items
   const navItems = [
-    { key: 'B', label: 'BLOGS', href: '/blog', isExternal: false },
+    { key: 'B', label: 'BLOQ', href: '/blog', isExternal: false },
     { key: 'X', label: 'X', href: 'https://x.com/eminmammadov', isExternal: true },
     { key: 'L', label: 'LINKEDIN', href: 'https://www.linkedin.com/in/eminmammadov', isExternal: true },
     { key: 'G', label: 'GITHUB', href: 'https://github.com/eminmammadov', isExternal: true },

@@ -5,25 +5,25 @@ import type { Metadata } from 'next';
 import { getFullUrl } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Tüm Yazılar',
-  description: 'Blockchain ve sistem memarlığı hakkında tüm blog yazılarımızı keşfedin.',
+  title: 'Bütün Yazılar',
+  description: 'Blockchain ve sistem memarlığı haqqında bütün blog yazılarımızı kəşfedin.',
   openGraph: {
-    title: 'Tüm Yazılar | Emin Blog',
-    description: 'Blockchain ve sistem memarlığı hakkında tüm blog yazılarımızı keşfedin.',
+    title: 'Bütün Yazılar | Emin Blog',
+    description: 'Blockchain ve sistem memarlığı haqqında bütün blog yazılarımızı kəşfedin.',
     url: getFullUrl('/blog'),
     images: [
       {
         url: getFullUrl('/images/og-image.jpg'),
         width: 1200,
         height: 630,
-        alt: 'Emin Blog - Tüm Yazılar',
+        alt: 'Emin Blog - Bütün Yazılar',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tüm Yazılar | Emin Blog',
-    description: 'Blockchain ve sistem memarlığı hakkında tüm blog yazılarımızı keşfedin.',
+    title: 'Bütün Yazılar | Emin Blog',
+    description: 'Blockchain ve sistem memarlığı haqqında bütün blog yazılarımızı kəşfedin.',
     images: [getFullUrl('/images/og-image.jpg')],
   },
 };
@@ -35,6 +35,7 @@ export default async function BlogPage() {
     <main>
       <BlogList
         posts={allPosts}
+        title="Bütün bloq yazıları"
       />
     </main>
   );

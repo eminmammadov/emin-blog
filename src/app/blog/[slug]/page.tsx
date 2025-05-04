@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   if (!post) {
     return {
-      title: 'Blog Yazısı Bulunamadı',
-      description: 'Aradığınız blog yazısı bulunamadı.',
+      title: 'Blog Yazıları Tapılmadı',
+      description: 'Axtardığınız bloq yazısı tapılmadı.',
     };
   }
 

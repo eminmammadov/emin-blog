@@ -8,16 +8,19 @@ import type { BlogPost } from '@/types/blog';
 interface BlogListProps {
   posts: BlogPost[];
   limit?: number;
+  title?: string;
 }
 
 export default function BlogList({
   posts,
-  limit
+  limit,
+  title
 }: BlogListProps) {
   const displayPosts = limit ? posts.slice(0, limit) : posts;
 
   return (
     <section className={styles.blogListContainer}>
+      {title && <h2 className={styles.blogListTitle}>/ {title}</h2>}
       <table className={styles.blogTable}>
         <thead>
           <tr className={styles.tableHeader}>
@@ -37,6 +40,11 @@ export default function BlogList({
                 <Link href={`/blog/${post.slug}`} className={styles.blogLink}>
                   <span className={styles.dateSquare} />
                   {post.date}
+                </Link>
+                <Link href={`/blog/${post.slug}`} className={`${styles.blogLink} ${styles.mobileTypeTag}`}>
+                  <span className={`${styles.typeTag} ${styles[post.type.toLowerCase()]}`}>
+                    {post.type}
+                  </span>
                 </Link>
               </td>
               <td className={styles.titleCell}>

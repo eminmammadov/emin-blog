@@ -5,6 +5,17 @@
   padding: 40px 16px;
 }
 
+.blogListTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--black);
+  letter-spacing: -0.05em;
+  border-bottom: 1px solid var(--black);
+  padding-bottom: 8px;
+  display: inline-block;
+}
+
 .blogTable {
   width: 100%;
   border-collapse: collapse;
@@ -97,6 +108,10 @@
   background-color: transparent;
 }
 
+.mobileTypeTag {
+  display: none !important;
+}
+
 .actionCell {
   padding: 10px 0;
   width: 50px;
@@ -138,21 +153,120 @@
 }
 
 @media (max-width: 480px) {
+  /* Hide the table headers on mobile */
+  .tableHeader {
+    display: none;
+  }
+
+  /* Change the display of table and rows */
+  .blogTable {
+    display: block;
+    border-top: 1px solid var(--black);
+  }
+
+  .blogRow {
+    display: block;
+    margin: 0;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--black);
+  }
+
+  /* Style all cells */
+  .blogRow td {
+    display: flex;
+    padding: 0;
+    border: none;
+  }
+
+  /* Style the date cell */
   .dateCell {
-    width: 70px;
-    font-size: 0.75rem;
-  }
-
-  .titleCell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
     font-size: 0.875rem;
+    margin-bottom: 10px;
+    text-align: left;
   }
 
+  .dateSquare {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: var(--black);
+    margin-right: 8px;
+  }
+
+  .mobileTypeTag {
+    display: block !important;
+    margin-left: auto;
+  }
+
+  /* Style the title cell */
+  .titleCell {
+    display: block;
+    width: 100%;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    margin-bottom: 0px;
+    font-weight: 600;
+    letter-spacing: -0.05em;
+    clear: both;
+  }
+
+  /* Container for type and action */
+  .typeCell, .actionCell {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  /* Style the type cell - hidden on mobile */
   .typeCell {
-    width: 70px;
+    display: none;
   }
 
+  /* Style the action cell - hidden on mobile */
+  .actionCell {
+    display: none;
+  }
+
+  /* Style the type tag */
   .typeTag {
-    font-size: 0.625rem;
-    padding: 2px 6px;
+    font-size: 0.75rem;
+    padding: 2px 10px;
+    border: 1px solid #333;
+    background-color: transparent;
+  }
+
+  /* Style the action button */
+  .actionButton {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  /* Create a wrapper for type and action cells */
+  .blogRow td:nth-child(3),
+  .blogRow td:nth-child(4) {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  /* Position the type cell */
+  .blogRow td:nth-child(3) {
+    float: left;
+    display: none;
+  }
+
+  /* Position the action cell */
+  .blogRow td:nth-child(4) {
+    float: right;
+    display: none;
+  }
+
+  /* Clear the floats */
+  .blogRow:after {
+    content: "";
+    display: table;
+    clear: both;
   }
 }
