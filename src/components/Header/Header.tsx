@@ -1,14 +1,65 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import styles from './Header.module.css';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Initialize search query from URL on component mount
+  useEffect(() => {
+    const query = searchParams.get('q');
+    if (query) {
+      setSearchQuery(query);
+      setIsSearchOpen(true);
+    }
+  }, [searchParams]);
+
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Handle search form submission
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Only update URL if we're on blog pages
+    if (pathname === '/' || pathname === '/blog' || pathname.startsWith('/blog/')) {
+      // Create new URL with search query
+      const params = new URLSearchParams(searchParams);
+
+      if (searchQuery) {
+        params.set('q', searchQuery);
+      } else {
+        params.delete('q');
+      }
+
+      // Update URL with search query
+      const newUrl = pathname + (params.toString() ? `?${params.toString()}` : '');
+      router.push(newUrl);
+    }
+  };
+
+  // Toggle search input visibility
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (!isSearchOpen) {
+      // Focus the input when opening
+      setTimeout(() => {
+        const input = document.getElementById('search-input');
+        if (input) input.focus();
+      }, 300);
+    }
+  };
 
   // Define navigation items
   const navItems = [
@@ -81,30 +132,73 @@ export default function Header() {
             </nav>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            type="button"
-            className={styles.mobileMenuButton}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle mobile menu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {/* Search Container */}
+            <div className={styles.searchContainer}>
+              <form onSubmit={handleSearchSubmit}>
+                <div className={`${styles.searchInputContainer} ${isSearchOpen ? styles.searchInputContainerOpen : ''}`}>
+                  <input
+                    id="search-input"
+                    type="text"
+                    className={styles.searchInput}
+                    placeholder="Axtarış..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    aria-label="Axtarış"
+                  />
+                </div>
+              </form>
+
+              <button
+                type="button"
+                className={styles.searchButton}
+                onClick={toggleSearch}
+                aria-label="Axtarış"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <title>Axtarış</title>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              type="button"
+              className={styles.mobileMenuButton}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
             >
-              <title>Menu</title>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <title>Menu</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 

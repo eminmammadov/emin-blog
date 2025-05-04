@@ -12,7 +12,7 @@ interface HeroProps {
 }
 
 export default function Hero({
-  title = "Tex-NO",
+  title = "RiseOfTech",
   highlightedText = "Emin Bloq",
   description = "Kriptaz'ın məhsul və xidmətlərinin inkişafında istifadə etdiyimiz az bilinən blokzincir texnologiyaları və sistem arxitekturası haqqında texniki məqalələr.",
 }: HeroProps) {

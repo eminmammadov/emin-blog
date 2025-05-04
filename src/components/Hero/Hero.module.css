@@ -31,10 +31,10 @@
 .description {
   font-size: 2.688rem;
   line-height: 1;
-  color: var(--black);
+  color: var(--gray);
   max-width: 1200px;
-  font-weight: 500;
-  letter-spacing: -0.08em;
+  font-weight: 400;
+  letter-spacing: -0.06em;
 }
 
 /* Responsive styles */
@@ -54,11 +54,11 @@
 
 @media (max-width: 480px) {
   .title {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .highlightedText {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .description {
