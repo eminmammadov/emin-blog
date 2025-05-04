@@ -44,7 +44,7 @@ export default async function Home() {
         <Hero />
         <BlogList
           posts={recentPosts}
-          limit={5}
+          limit={10}
         />
         <Link href="/blog" className={styles.viewAllButton}>
           Bütün Bloqlar

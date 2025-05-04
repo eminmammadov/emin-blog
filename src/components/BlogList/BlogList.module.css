@@ -91,7 +91,10 @@
 
 .typeCell {
   padding: 10px 0;
-  width: 100px;
+  width: 170px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-align: right;
 }
 
