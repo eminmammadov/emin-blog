@@ -4,6 +4,13 @@ import { useState, useEffect } from 'react';
 import styles from './admin.module.css';
 import Link from 'next/link';
 import type { BlogPost } from '@/types/blog';
+import dynamic from 'next/dynamic';
+
+// Dinamik olarak import ediyoruz çünkü bu bileşen sadece client tarafında çalışabilir
+const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+  ssr: false,
+  loading: () => <div className={styles.loading}>Editör yüklənir...</div>
+});
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'create' | 'list'>('create');
@@ -57,7 +64,7 @@ export default function AdminPage() {
         setLoading(true);
         const response = await fetch('/api/blogs');
         if (!response.ok) {
-          throw new Error('Blog yazıları yüklenirken bir hata oluştu');
+          throw new Error('Bloq yazıları yüklənərkən bir xəta baş verdi');
         }
         const data = await response.json();
         setBlogs(data);
@@ -78,6 +85,11 @@ export default function AdminPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Zengin metin düzenleyici için özel değişiklik işleyicisi
+  const handleEditorChange = (value: string) => {
+    setFormData(prev => ({ ...prev, content: value }));
+  };
+
   const generateSlug = () => {
     const slug = formData.title
       .toLowerCase()
@@ -95,7 +107,7 @@ export default function AdminPage() {
       setLoading(true);
       const response = await fetch('/api/blogs');
       if (!response.ok) {
-        throw new Error('Blog yazıları yüklenirken bir hata oluştu');
+        throw new Error('Bloq yazıları yüklənərkən bir xəta baş verdi');
       }
       const data = await response.json();
       setBlogs(data);
@@ -106,9 +118,9 @@ export default function AdminPage() {
     }
   };
 
-  // Function to delete a blog
+  // Function to delete a bloq
   const deleteBlog = async (slug: string) => {
-    if (!confirm('Bu blog yazısını silmek istediğinizden emin misiniz?')) {
+    if (!confirm('Bu bloq yazısını silmek istediğinizden emin misiniz?')) {
       return;
     }
 
@@ -129,7 +141,7 @@ export default function AdminPage() {
       setStatus({ message: 'Blog yazısı başarıyla silindi!', type: 'success' });
       fetchBlogs();
     } catch (error) {
-      console.error('Error deleting blog:', error);
+      console.error('Error deleting bloq:', error);
       setStatus({
         message: error instanceof Error ? error.message : 'Bir hata oluştu',
         type: 'error'
@@ -183,12 +195,12 @@ export default function AdminPage() {
         author: 'Emin Mammadov',
       });
 
-      // Refresh blog list if we're in list view
+      // Refresh bloq list if we're in list view
       if (activeTab === 'list') {
         fetchBlogs();
       }
     } catch (error) {
-      console.error('Error creating blog:', error);
+      console.error('Error creating bloq:', error);
       setStatus({
         message: error instanceof Error ? error.message : 'Bir hata oluştu',
         type: 'error'
@@ -204,14 +216,14 @@ export default function AdminPage() {
           className={`${styles.tabButton} ${activeTab === 'create' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('create')}
         >
-          Yeni Blog Yazısı
+          Yeni Bloq Yaz
         </button>
         <button
           type="button"
           className={`${styles.tabButton} ${activeTab === 'list' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('list')}
         >
-          Blog Yazıları
+          Bütün Bloqlar
         </button>
       </div>
 
@@ -223,10 +235,10 @@ export default function AdminPage() {
 
       {activeTab === 'create' ? (
         <>
-          <h1 className={styles.adminTitle}>Yeni Blog Yazısı Ekle</h1>
+          <h1 className={styles.adminTitle}>Yeni Bloq Yazısı Yaz</h1>
           <form onSubmit={handleSubmit} className={styles.blogForm}>
         <div className={styles.formGroup}>
-          <label htmlFor="title">Başlık</label>
+          <label htmlFor="title">Başlıq</label>
           <input
             type="text"
             id="title"
@@ -237,45 +249,47 @@ export default function AdminPage() {
           />
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="slug">Slug</label>
-          <div className={styles.slugContainer}>
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label htmlFor="slug">Slug</label>
+            <div className={styles.slugContainer}>
+              <input
+                type="text"
+                id="slug"
+                name="slug"
+                value={formData.slug}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                onClick={generateSlug}
+                className={styles.generateButton}
+              >
+                Yarad
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="date">Tarixçə (Avtomatik)</label>
             <input
               type="text"
-              id="slug"
-              name="slug"
-              value={formData.slug}
+              id="date"
+              name="date"
+              value={formData.date}
               onChange={handleChange}
-              required
+              readOnly
+              className={styles.readOnlyInput}
             />
-            <button
-              type="button"
-              onClick={generateSlug}
-              className={styles.generateButton}
-            >
-              Oluştur
-            </button>
+            <small className={styles.helpText}>
+              Blog yazısı əlavə edilərkən avtomatik olaraq o anki tarix və saat istifadə ediləcəkdir.
+            </small>
           </div>
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="date">Tarih (Otomatik oluşturulur)</label>
-          <input
-            type="text"
-            id="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            readOnly
-            className={styles.readOnlyInput}
-          />
-          <small className={styles.helpText}>
-            Blog yazısı eklendiğinde otomatik olarak güncel tarih ve saat kullanılacaktır.
-          </small>
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="excerpt">Özet</label>
+          <label htmlFor="excerpt">Qısa Açıqlama</label>
           <textarea
             id="excerpt"
             name="excerpt"
@@ -286,39 +300,41 @@ export default function AdminPage() {
           />
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="categories">Kategoriler (virgülle ayırın)</label>
-          <input
-            type="text"
-            id="categories"
-            name="categories"
-            value={formData.categories}
-            onChange={handleChange}
-            required
-          />
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label htmlFor="categories">Kateqoriya (vergüllə ayırın)</label>
+            <input
+              type="text"
+              id="categories"
+              name="categories"
+              value={formData.categories}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="author">Yazan</label>
+            <input
+              type="text"
+              id="author"
+              name="author"
+              value={formData.author}
+              onChange={handleChange}
+            />
+          </div>
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="author">Yazar</label>
-          <input
-            type="text"
-            id="author"
-            name="author"
-            value={formData.author}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="content">İçerik (Markdown)</label>
-          <textarea
-            id="content"
-            name="content"
+          <label htmlFor="content">Content</label>
+          <RichTextEditor
             value={formData.content}
-            onChange={handleChange}
-            required
-            rows={15}
+            onChange={handleEditorChange}
+            placeholder="Blog içeriğinizi buraya yazın..."
           />
+          <small className={styles.helpText}>
+            Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin və şəklin URL-ni daxil edin. Link əlavə etmək üçün mətni seçin və 🔗 düyməsini sıxın.
+          </small>
         </div>
 
         <button type="submit" className={styles.submitButton}>
@@ -328,23 +344,23 @@ export default function AdminPage() {
       </>
       ) : (
         <>
-          <h1 className={styles.adminTitle}>Blog Yazıları</h1>
+          <h1 className={styles.adminTitle}>Bloq Yazıları</h1>
 
           {loading ? (
-            <div className={styles.loading}>Yükleniyor...</div>
+            <div className={styles.loading}>Yüklənir...</div>
           ) : blogs.length === 0 ? (
             <div className={styles.emptyState}>
-              Henüz blog yazısı bulunmuyor.
+              Bloq yazısı tapılmadı.
             </div>
           ) : (
             <div className={styles.blogList}>
               <table className={styles.blogTable}>
                 <thead>
                   <tr>
-                    <th>Başlık</th>
-                    <th>Tarih</th>
-                    <th>Kateqori</th>
-                    <th>İşlemler</th>
+                    <th>Başlıq</th>
+                    <th>Tarixçə</th>
+                    <th>Kateqoriya</th>
+                    <th>Əməliyyatlar</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -355,10 +371,10 @@ export default function AdminPage() {
                       <td>{blog.category}</td>
                       <td className={styles.actions}>
                         <Link href={`/blog/${blog.slug}`} target="_blank" className={styles.viewButton}>
-                          Görüntüle
+                          Bloqa Bax
                         </Link>
                         <Link href={`/a/0x/admin/edit/${blog.slug}`} className={styles.editButton}>
-                          Düzenle
+                          Düzəlt
                         </Link>
                         <button
                           type="button"

@@ -4,6 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from '../../admin.module.css';
+import dynamic from 'next/dynamic';
+
+// Dinamik olarak import ediyoruz çünkü bu bileşen sadece client tarafında çalışabilir
+const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+  ssr: false,
+  loading: () => <div className={styles.loading}>Editör yükleniyor...</div>
+});
 
 export default function EditBlogPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
@@ -69,6 +76,11 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Zengin metin düzenleyici için özel değişiklik işleyicisi
+  const handleEditorChange = (value: string) => {
+    setFormData(prev => ({ ...prev, content: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -128,7 +140,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
       <div className={styles.editHeader}>
         <h1 className={styles.adminTitle}>Blog Yazısını Düzenle</h1>
         <Link href="/a/0x/admin" className={styles.backLink}>
-          ← Admin Paneline Dön
+          ← Admin Panelinə Get
         </Link>
       </div>
 
@@ -140,7 +152,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
 
       <form onSubmit={handleSubmit} className={styles.blogForm}>
         <div className={styles.formGroup}>
-          <label htmlFor="title">Başlık</label>
+          <label htmlFor="title">Başlıq</label>
           <input
             type="text"
             id="title"
@@ -152,7 +164,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="excerpt">Özet</label>
+          <label htmlFor="excerpt">Qısa Açıqlama</label>
           <textarea
             id="excerpt"
             name="excerpt"
@@ -163,43 +175,45 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
           />
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="categories">Kategoriler (virgülle ayırın)</label>
-          <input
-            type="text"
-            id="categories"
-            name="categories"
-            value={formData.categories}
-            onChange={handleChange}
-            required
-          />
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label htmlFor="categories">Kategoriya (vergüllə ayırın)</label>
+            <input
+              type="text"
+              id="categories"
+              name="categories"
+              value={formData.categories}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="author">Yazan</label>
+            <input
+              type="text"
+              id="author"
+              name="author"
+              value={formData.author}
+              onChange={handleChange}
+            />
+          </div>
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="author">Yazar</label>
-          <input
-            type="text"
-            id="author"
-            name="author"
-            value={formData.author}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="content">İçerik (Markdown)</label>
-          <textarea
-            id="content"
-            name="content"
+          <label htmlFor="content">Content</label>
+          <RichTextEditor
             value={formData.content}
-            onChange={handleChange}
-            required
-            rows={15}
+            onChange={handleEditorChange}
+            placeholder="Blog içeriğinizi buraya yazın..."
           />
+          <small className={styles.helpText}>
+            Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin və şəklin URL-ni daxil edin. Link əlavə etmək üçün mətni seçin və 🔗 düyməsini sıxın.
+          </small>
         </div>
 
         <button type="submit" className={styles.submitButton}>
-          Blog Yazısını Güncelle
+          Bloq Yazısını Yeniləyin
         </button>
       </form>
     </div>

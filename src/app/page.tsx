@@ -11,10 +11,10 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Əsas Səhifə',
-  description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
+  description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji bloq yazıları',
   openGraph: {
     title: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
-    description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
+    description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji bloq yazıları',
     url: getFullUrl('/'),
     images: [
       {
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
-    description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji blog yazıları',
+    description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji bloq yazıları',
     images: [getFullUrl('/images/og-image.jpg')],
   },
 };

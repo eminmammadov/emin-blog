@@ -1,5 +1,5 @@
 .adminContainer {
-  max-width: 1700px;
+  max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
 }
@@ -47,13 +47,24 @@
 }
 
 .blogForm {
-  background-color: var(--background);
+  background-color: var(--light);
   padding: 30px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--foreground);
 }
 
 .formGroup {
   margin-bottom: 20px;
+}
+
+.formRow {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.formRow .formGroup {
+  flex: 1;
+  margin-bottom: 0;
 }
 
 .formGroup label {
@@ -67,7 +78,7 @@
 .formGroup select {
   width: 100%;
   padding: 10px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--foreground);
   font-family: inherit;
   font-size: 1rem;
 }
@@ -97,7 +108,7 @@
 .generateButton {
   padding: 0 15px;
   background-color: #f0f0f0;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--foreground);
   cursor: pointer;
   white-space: nowrap;
 }
@@ -161,7 +172,7 @@
 .blogTable td {
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  border: 1px solid var(--foreground);
 }
 
 .blogTable th {
@@ -183,7 +194,6 @@
 .editButton,
 .deleteButton {
   padding: 6px 12px;
-  border-radius: 4px;
   font-size: 0.8rem;
   cursor: pointer;
   text-decoration: none;
@@ -193,7 +203,7 @@
 .viewButton {
   background-color: #f0f0f0;
   color: var(--black);
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--foreground);
 }
 
 .editButton {
@@ -231,7 +241,7 @@
   padding: 40px;
   color: #666;
   background-color: #f8f8f8;
-  border: 1px dashed #e0e0e0;
+  border: 1px solid var(--foreground);
   border-radius: 4px;
 }
 
@@ -247,8 +257,7 @@
   padding: 8px 16px;
   background-color: #f0f0f0;
   color: var(--black);
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border: 1px solid var(--foreground);
   text-decoration: none;
   font-size: 0.9rem;
 }
@@ -279,5 +288,14 @@
   .actions {
     flex-direction: column;
     gap: 5px;
+  }
+
+  .formRow {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .formRow .formGroup {
+    margin-bottom: 0;
   }
 }

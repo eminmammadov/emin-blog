@@ -1,5 +1,5 @@
 .blogPostContainer {
-  max-width: 1700px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 30px 16px;
 }
@@ -18,7 +18,7 @@
   margin-bottom: 60px;
   color: var(--black);
   letter-spacing: -0.08em;
-  max-width: 1500px;
+  max-width: 1000px;
 }
 
 .sectionTitle {

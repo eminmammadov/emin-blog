@@ -14,7 +14,7 @@ interface HeroProps {
 export default function Hero({
   title = "Tex-NO",
   highlightedText = "Emin Bloq",
-  description = "Blockchain və sistem memarlığı haqqında texnoloji blog yazıları.",
+  description = "Kriptaz'ın məhsul və xidmətlərinin inkişafında istifadə etdiyimiz az bilinən blokzincir texnologiyaları və sistem arxitekturası haqqında texniki məqalələr.",
 }: HeroProps) {
   return (
     <section className={styles.heroContainer}>
