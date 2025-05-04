@@ -161,7 +161,7 @@ export default function Header() {
                     id="search-input"
                     type="text"
                     className={styles.searchInput}
-                    placeholder="Axtarış..."
+                    placeholder="Axtar"
                     value={searchQuery}
                     onChange={handleSearchChange}
                     aria-label="Axtarış"

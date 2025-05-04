@@ -5,6 +5,7 @@ import Link from 'next/link';
 import styles from './styles.module.css';
 import type { Metadata } from 'next';
 import { getFullUrl } from '@/lib/utils';
+import { Suspense } from 'react';
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic';
@@ -42,10 +43,12 @@ export default async function Home() {
     return (
       <main>
         <Hero />
-        <BlogList
-          posts={recentPosts}
-          limit={10}
-        />
+        <Suspense fallback={<div>Yüklənir...</div>}>
+          <BlogList
+            posts={recentPosts}
+            limit={10}
+          />
+        </Suspense>
         <Link href="/blog" className={styles.viewAllButton}>
           Bütün Bloqlar
         </Link>

@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Suspense } from "react";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -111,7 +112,9 @@ export default function RootLayout({
         data-new-gr-c-s-check-loaded="14.1233.0"
         data-gr-ext-installed=""
       >
-        <Header />
+        <Suspense fallback={<div className="h-16 bg-[#F7F7F3]"/>}>
+          <Header />
+        </Suspense>
         <main className="flex-grow">
           {children}
         </main>

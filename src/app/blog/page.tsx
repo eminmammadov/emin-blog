@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { getAllBlogs } from '@/lib/mdx';
 import BlogList from '@/components/BlogList';
 import type { Metadata } from 'next';
@@ -39,10 +39,12 @@ export default async function BlogPage() {
 
     return (
       <main>
-        <BlogList
-          posts={allPosts}
-          title="Bütün bloq yazıları"
-        />
+        <Suspense fallback={<div>Yüklənir...</div>}>
+          <BlogList
+            posts={allPosts}
+            title="Bütün bloq yazıları"
+          />
+        </Suspense>
       </main>
     );
   } catch (error) {
