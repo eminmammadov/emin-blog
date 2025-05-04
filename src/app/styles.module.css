@@ -1,7 +1,8 @@
 .viewAllButton {
   display: block;
-  margin: 20px auto;
-  padding: 5px 10px;
+  margin: 0px auto;
+  margin-bottom: 30px !important;
+  padding: 4px 10px;
   background-color: transparent;
   border: 1px solid var(--black);
   font-size: 0.9rem;
