@@ -2,6 +2,7 @@
 
 import React from 'react';
 import styles from '../../app/blog/[slug]/blogPost.module.css';
+import { getShortUrl } from '@/lib/shortLink';
 
 interface ShareButtonsProps {
   title: string;
@@ -11,10 +12,12 @@ interface ShareButtonsProps {
 export default function ShareButtons({ title, slug }: ShareButtonsProps) {
   const handleTwitterShare = () => {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://emin-blog.vercel.app';
-    const fullUrl = `${siteUrl}/blog/${slug}`;
+
+    // Kısa URL oluştur
+    const shortUrl = getShortUrl(siteUrl, slug);
 
     // Twitter için paylaşım URL'si
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title} via @eminmammadov`)}&url=${encodeURIComponent(fullUrl)}`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title} via @eminmammadov`)}&url=${encodeURIComponent(shortUrl)}`;
 
     // Mini pencere açalım
     window.open(twitterUrl, 'twitter-share', 'width=550,height=435');
@@ -24,11 +27,13 @@ export default function ShareButtons({ title, slug }: ShareButtonsProps) {
   const handleLinkedInShare = () => {
     // LinkedIn için doğrudan paylaşım yöntemi
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://emin-blog.vercel.app';
-    const fullUrl = `${siteUrl}/blog/${slug}`;
+
+    // Kısa URL oluştur
+    const shortUrl = getShortUrl(siteUrl, slug);
 
     // Doğrudan LinkedIn'in paylaşım sayfasına yönlendir
     // Bu, kullanıcının LinkedIn'e giriş yapmasını ve paylaşım yapmasını sağlar
-    const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(`${title} via @eminmammadov ${fullUrl}`)}`;
+    const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(`${title} via @eminmammadov ${shortUrl}`)}`;
 
     // Yeni bir sekmede açalım
     window.open(linkedinUrl, '_blank');

@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /_protected/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /a/0x/
+Disallow: /api/
+
+Sitemap: https://emin.kriptaz.com/sitemap.xml

@@ -103,7 +103,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
 
       // Redirect to admin page after 2 seconds
       setTimeout(() => {
-        router.push('/admin');
+        router.push('/dashboard');
       }, 2000);
     } catch (error) {
       console.error('Error updating blog:', error);
@@ -127,7 +127,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
     <div className={styles.adminContainer}>
       <div className={styles.editHeader}>
         <h1 className={styles.adminTitle}>Blog Yazısını Düzenle</h1>
-        <Link href="/admin" className={styles.backLink}>
+        <Link href="/dashboard" className={styles.backLink}>
           ← Admin Paneline Dön
         </Link>
       </div>
