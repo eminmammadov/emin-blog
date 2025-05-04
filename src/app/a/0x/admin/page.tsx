@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import styles from '../../../dashboard/admin.module.css';
+import styles from './admin.module.css';
 import Link from 'next/link';
 import type { BlogPost } from '@/types/blog';
 
@@ -23,12 +23,12 @@ export default function AdminPage() {
     // Get hours and minutes directly to avoid duplicate AM/PM in some browsers
     const hours = now.getHours();
     const minutes = now.getMinutes();
-    
+
     // Format time as HH:MM
     const formattedHours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    
+
     return `${dateStr} - ${formattedHours}:${formattedMinutes} ${ampm}`;
   };
 

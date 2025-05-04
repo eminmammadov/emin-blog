@@ -1,56 +1,81 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Admin paneli ve API'ler için erişim bilgileri
 // Gerçek bir uygulamada bu değerler .env dosyasında saklanmalıdır
 const ADMIN_USERNAME = 'eminx';
 const ADMIN_PASSWORD = '0xAdmin#321';
 
-// Basic Auth için gerekli header'ı oluştur
-const BASIC_AUTH_HEADER = `Basic ${Buffer.from(`${ADMIN_USERNAME}:${ADMIN_PASSWORD}`).toString('base64')}`;
+// Basic Auth için gerekli credential'ı oluştur
+const BASIC_AUTH_CREDENTIAL = Buffer.from(`${ADMIN_USERNAME}:${ADMIN_PASSWORD}`).toString('base64');
+
+console.log('Expected credential:', BASIC_AUTH_CREDENTIAL);
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   console.log(`Middleware processing path: ${pathname}`);
 
-  // Admin sayfaları veya korumalı API'ler için kimlik doğrulama gerekli
-  const isProtectedRoute =
-    pathname.startsWith('/a/0x/admin') ||
-    (pathname.startsWith('/api/blogs') &&
-     (pathname.includes('/create') ||
-      pathname.includes('/delete') ||
-      pathname.includes('/update')));
-
-  if (isProtectedRoute) {
-    console.log(`Protected route detected: ${pathname}`);
+  // Admin sayfaları için kimlik doğrulama
+  if (pathname === '/a/0x/admin' || pathname.startsWith('/a/0x/admin/')) {
+    console.log(`Admin route detected: ${pathname}`);
 
     // Authorization header'ını kontrol et
     const authHeader = request.headers.get('Authorization');
-    console.log(`Auth header: ${authHeader ? 'Present' : 'Missing'}`);
+    console.log(`Auth header: ${authHeader || 'Missing'}`);
+
+    // Credential'ı çıkar ve kontrol et
+    let isAuthorized = false;
+    if (authHeader && authHeader.startsWith('Basic ')) {
+      const credential = authHeader.substring(6); // 'Basic ' sonrası
+      console.log('Received credential:', credential);
+      isAuthorized = credential === BASIC_AUTH_CREDENTIAL;
+    }
 
     // Header yoksa veya geçersizse, kimlik doğrulama iste
-    if (!authHeader || authHeader !== BASIC_AUTH_HEADER) {
+    if (!isAuthorized) {
       console.log('Authentication failed, requesting credentials');
 
-      // Admin sayfaları için kimlik doğrulama penceresi göster
-      if (pathname.startsWith('/a/0x/admin')) {
+      // Kimlik doğrulama penceresi göster
+      return new NextResponse(null, {
+        status: 401,
+        headers: {
+          'WWW-Authenticate': 'Basic realm="Admin Panel", charset="UTF-8"',
+          'Content-Type': 'text/html',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+    }
 
-        console.log('Returning 401 with WWW-Authenticate header');
-        return new NextResponse(null, {
-          status: 401,
-          headers: {
-            'WWW-Authenticate': 'Basic realm="Admin Panel", charset="UTF-8"',
-            'Content-Type': 'text/html',
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        });
-      }
+    console.log('Admin authentication successful');
+    return NextResponse.next();
+  }
 
-      // API istekleri için 401 hatası döndür
-      console.log('Returning 401 for API request');
+  // Korumalı API'ler için kimlik doğrulama
+  if (pathname.startsWith('/api/blogs') &&
+      (pathname.includes('/create') ||
+       pathname.includes('/delete') ||
+       pathname.includes('/update'))) {
+
+    console.log(`Protected API route detected: ${pathname}`);
+
+    // Authorization header'ını kontrol et
+    const authHeader = request.headers.get('Authorization');
+    console.log(`API Auth header: ${authHeader || 'Missing'}`);
+
+    // Credential'ı çıkar ve kontrol et
+    let isAuthorized = false;
+    if (authHeader && authHeader.startsWith('Basic ')) {
+      const credential = authHeader.substring(6); // 'Basic ' sonrası
+      console.log('API received credential:', credential);
+      isAuthorized = credential === BASIC_AUTH_CREDENTIAL;
+    }
+
+    // Header yoksa veya geçersizse, 401 hatası döndür
+    if (!isAuthorized) {
+      console.log('API authentication failed');
+
       return new NextResponse(
         JSON.stringify({ error: 'Unauthorized' }),
         {
@@ -65,7 +90,7 @@ export function middleware(request: NextRequest) {
       );
     }
 
-    console.log('Authentication successful');
+    console.log('API authentication successful');
   }
 
   return NextResponse.next();

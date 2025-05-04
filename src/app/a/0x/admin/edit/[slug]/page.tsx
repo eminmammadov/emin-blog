@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import styles from '../../../../dashboard/admin.module.css';
+import styles from '../../admin.module.css';
 
 export default function EditBlogPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
     categories: '',
     author: '',
   });
-  
+
   const [status, setStatus] = useState<{
     message: string;
     type: 'success' | 'error' | 'info' | null;
@@ -25,7 +25,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
     message: '',
     type: null,
   });
-  
+
   // Fetch blog data
   useEffect(() => {
     const fetchBlog = async () => {
@@ -36,13 +36,13 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
             'Authorization': `Basic ${btoa('eminx:0xAdmin#321')}`
           }
         });
-        
+
         if (!response.ok) {
           throw new Error('Blog yazısı yüklenirken bir hata oluştu');
         }
-        
+
         const blog = await response.json();
-        
+
         setFormData({
           title: blog.title,
           excerpt: blog.excerpt,
@@ -60,27 +60,27 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
         setLoading(false);
       }
     };
-    
+
     fetchBlog();
   }, [params.slug]);
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setStatus({ message: 'Güncelleniyor...', type: 'info' });
-      
+
       // Convert categories string to array
       const categoriesArray = formData.categories
         .split(',')
         .map(cat => cat.trim())
         .filter(cat => cat);
-      
+
       const response = await fetch(`/api/blogs/${params.slug}/update`, {
         method: 'PUT',
         headers: {
@@ -92,15 +92,15 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
           categories: categoriesArray,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Bir hata oluştu');
       }
-      
+
       setStatus({ message: 'Blog yazısı başarıyla güncellendi!', type: 'success' });
-      
+
       // Redirect to admin page after 2 seconds
       setTimeout(() => {
         router.push('/a/0x/admin');
@@ -113,7 +113,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
       });
     }
   };
-  
+
   if (loading) {
     return (
       <div className={styles.adminContainer}>
@@ -122,7 +122,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
       </div>
     );
   }
-  
+
   return (
     <div className={styles.adminContainer}>
       <div className={styles.editHeader}>
@@ -131,13 +131,13 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
           ← Admin Paneline Dön
         </Link>
       </div>
-      
+
       {status.message && (
         <div className={`${styles.statusMessage} ${styles[status.type || '']}`}>
           {status.message}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className={styles.blogForm}>
         <div className={styles.formGroup}>
           <label htmlFor="title">Başlık</label>
@@ -150,7 +150,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
             required
           />
         </div>
-        
+
         <div className={styles.formGroup}>
           <label htmlFor="excerpt">Özet</label>
           <textarea
@@ -162,7 +162,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
             rows={3}
           />
         </div>
-        
+
         <div className={styles.formGroup}>
           <label htmlFor="categories">Kategoriler (virgülle ayırın)</label>
           <input
@@ -174,7 +174,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
             required
           />
         </div>
-        
+
         <div className={styles.formGroup}>
           <label htmlFor="author">Yazar</label>
           <input
@@ -185,7 +185,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
             onChange={handleChange}
           />
         </div>
-        
+
         <div className={styles.formGroup}>
           <label htmlFor="content">İçerik (Markdown)</label>
           <textarea
@@ -197,7 +197,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
             rows={15}
           />
         </div>
-        
+
         <button type="submit" className={styles.submitButton}>
           Blog Yazısını Güncelle
         </button>
