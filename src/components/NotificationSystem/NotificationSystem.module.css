@@ -72,14 +72,13 @@
 }
 
 .markAsReadButton {
-  color: #0066cc;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
-  color: #0066cc;
+  color: var(--blue);
 }
 
 .notificationList {
@@ -159,7 +158,7 @@
   display: block;
   text-align: center;
   padding: 12px;
-  color: #0066cc;
+  color: var(--blue);
   text-decoration: none;
   font-size: 14px;
   border-top: 1px solid #e0e0e0;

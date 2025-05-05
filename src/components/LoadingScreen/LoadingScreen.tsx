@@ -20,7 +20,8 @@ export default function LoadingScreen() {
   }, []);
 
   // Sayfa geçişlerini izle
-  useEffect(() => {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+    useEffect(() => {
     // Sayfa değiştiğinde loading göster
     setIsPageTransition(true);
 

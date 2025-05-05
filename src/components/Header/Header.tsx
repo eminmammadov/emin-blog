@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import styles from './Header.module.css';
 import NotificationSystem from '@/components/NotificationSystem';
+import DonateSystem from '@/components/DonateSystem';
 import SearchBar from '@/components/SearchBar';
 
 export default function Header() {
@@ -111,6 +112,9 @@ export default function Header() {
 
             {/* Notification System */}
             <NotificationSystem />
+
+            {/* Donate System */}
+            <DonateSystem />
 
             {/* Mobile Menu Button */}
             <button
