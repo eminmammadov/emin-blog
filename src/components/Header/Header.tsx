@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import styles from './Header.module.css';
+import NotificationSystem from '@/components/NotificationSystem';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -212,6 +213,9 @@ export default function Header() {
                 )}
               </button>
             </div>
+
+            {/* Notification System */}
+            <NotificationSystem />
 
             {/* Mobile Menu Button */}
             <button

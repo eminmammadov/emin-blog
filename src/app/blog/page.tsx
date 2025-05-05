@@ -60,10 +60,10 @@ export default async function BlogPage() {
           border: '1px solid #e0e0e0'
         }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>
-            Blog yazıları yüklenirken bir hata oluştu
+            Bloq yazıları yüklənərkər bir xəta baş verdi
           </h2>
           <p style={{ fontSize: '1rem', color: '#666' }}>
-            Lütfen daha sonra tekrar deneyin.
+            Xahiş edirik bir qədər sonra təkrar yoxlayın.
           </p>
         </div>
       </main>
