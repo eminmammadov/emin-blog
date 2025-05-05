@@ -52,7 +52,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 580px) {
   .title {
     font-size: 2rem;
   }

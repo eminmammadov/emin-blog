@@ -305,11 +305,26 @@ export default function NotificationSystem({ className }: NotificationSystemProp
 
             // Daha önce okunmuş bildirimleri localStorage'dan al
             const readNotificationsJSON = localStorage.getItem('readNotifications');
-            let readNotifications: string[] = [];
+            let readNotifications: Record<string, number> = {}; // ID -> okunma zamanı (timestamp)
 
             if (readNotificationsJSON) {
               try {
-                readNotifications = JSON.parse(readNotificationsJSON);
+                // Eski format (string[]) veya yeni format (Record<string, number>) olabilir
+                const parsed = JSON.parse(readNotificationsJSON);
+                
+                if (Array.isArray(parsed)) {
+                  // Eski format: string[] -> Record<string, number> dönüşümü
+                  console.log('Converting old readNotifications format to new format');
+                  for (const id of parsed) {
+                    readNotifications[id] = Date.now(); // Şu anki zamanı kullan
+                  }
+                  // Yeni formatı localStorage'a kaydet
+                  localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
+                } else {
+                  // Yeni format: Record<string, number>
+                  readNotifications = parsed;
+                }
+                
                 console.log('Read notifications loaded from localStorage:', readNotifications);
               } catch (error) {
                 console.error('Error parsing read notifications from localStorage:', error);
@@ -320,37 +335,20 @@ export default function NotificationSystem({ className }: NotificationSystemProp
             const blogNotifications = latestPosts.map((post: BlogPostType) => {
               const postId = post._id || post.slug;
               // Daha önce okunmuş mu kontrol et
-              const isRead = readNotifications.includes(postId);
-
-              console.log(`Creating notification for post: ${post.title}, using date: ${post.date}, read: ${isRead}`);
-
-              // Eğer okunmuşsa, okunma zamanını ekle (localStorage'dan alınamıyorsa şu anki zamanı kullan)
+              const isRead = postId in readNotifications;
+              
+              // Okunma zamanını al
               let readAt: number | undefined = undefined;
               if (isRead) {
-                // Daha önce kaydedilmiş bildirimleri kontrol et
-                const oldNotificationsJSON = localStorage.getItem('notifications');
-                if (oldNotificationsJSON) {
-                  try {
-                    const oldNotifications = JSON.parse(oldNotificationsJSON);
-                    const oldNotification = oldNotifications.find((n: NotificationType) => n.id === postId);
-                    if (oldNotification?.readAt) {
-                      readAt = oldNotification.readAt;
-                    } else {
-                      readAt = Date.now(); // Eğer bulunamazsa şu anki zamanı kullan
-                    }
-                  } catch (error) {
-                    console.error('Error parsing old notifications:', error);
-                    readAt = Date.now();
-                  }
-                } else {
-                  readAt = Date.now();
-                }
+                readAt = readNotifications[postId];
               }
+
+              console.log(`Creating notification for post: ${post.title}, using date: ${post.date}, read: ${isRead}, readAt: ${readAt}`);
 
               return {
                 id: postId,
                 message: post.title,
-                date: post.date, // Tarih değerini doğrudan kullan
+                date: formatDate(post.date),
                 read: isRead, // Daha önce okunmuşsa true, okunmamışsa false
                 readAt: isRead ? readAt : undefined, // Okunmuşsa okunma zamanını ekle
                 slug: post.slug
@@ -380,6 +378,11 @@ export default function NotificationSystem({ className }: NotificationSystemProp
             setNotifications(filteredNotifications);
             setHasUnreadNotifications(hasUnread);
             localStorage.setItem('notifications', JSON.stringify(filteredNotifications));
+            
+            // Tüm bildirimlerin okunma durumunu kontrol et
+            const allRead = filteredNotifications.every(notification => notification.read);
+            setAreAllNotificationsRead(allRead);
+            
             return;
           }
 
@@ -394,7 +397,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
 
       fetchDirectFromAPI();
     }
-  }, [fetchBlogPosts]);
+  }, [fetchBlogPosts, formatDate]);
 
   // Close notification dropdown when clicking outside
   useEffect(() => {
@@ -443,6 +446,10 @@ export default function NotificationSystem({ className }: NotificationSystemProp
           // Okunmamış bildirim var mı kontrol et
           const hasUnread = filteredNotifications.some(notification => !notification.read);
           setHasUnreadNotifications(hasUnread);
+          
+          // Tüm bildirimlerin okunma durumunu kontrol et
+          const allRead = filteredNotifications.every(notification => notification.read);
+          setAreAllNotificationsRead(allRead);
         }
       }
     }, 5 * 60 * 1000); // 5 dakikada bir kontrol et
@@ -488,30 +495,36 @@ export default function NotificationSystem({ className }: NotificationSystemProp
 
     // Kalıcı olarak tüm bildirimleri okundu olarak işaretle
     const readNotificationsJSON = localStorage.getItem('readNotifications');
-    let readNotifications: string[] = [];
+    let readNotifications: Record<string, number> = {};
 
     if (readNotificationsJSON) {
       try {
-        readNotifications = JSON.parse(readNotificationsJSON);
+        // Eski format (string[]) veya yeni format (Record<string, number>) olabilir
+        const parsed = JSON.parse(readNotificationsJSON);
+        
+        if (Array.isArray(parsed)) {
+          // Eski format: string[] -> Record<string, number> dönüşümü
+          console.log('Converting old readNotifications format to new format');
+          for (const id of parsed) {
+            readNotifications[id] = currentTime; // Şu anki zamanı kullan
+          }
+        } else {
+          // Yeni format: Record<string, number>
+          readNotifications = parsed;
+        }
       } catch (error) {
         console.error('Error parsing read notifications:', error);
       }
     }
 
     // Tüm bildirimleri okundu olarak işaretle
-    let updated = false;
     for (const notification of notifications) {
-      if (!readNotifications.includes(notification.id)) {
-        readNotifications.push(notification.id);
-        updated = true;
-      }
+      readNotifications[notification.id] = currentTime;
     }
 
-    // Eğer değişiklik yapıldıysa localStorage'ı güncelle
-    if (updated) {
-      localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
-      console.log('All notifications marked as read permanently');
-    }
+    // localStorage'ı güncelle
+    localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
+    console.log('All notifications marked as read permanently');
   };
 
   // Mark a single notification as read
@@ -531,28 +544,42 @@ export default function NotificationSystem({ className }: NotificationSystemProp
     // Check if there are any unread notifications left
     const unreadExists = updatedNotifications.some(notification => !notification.read);
     setHasUnreadNotifications(unreadExists);
+    
+    // Tüm bildirimlerin okunma durumunu kontrol et
+    const allRead = updatedNotifications.every(notification => notification.read);
+    setAreAllNotificationsRead(allRead);
 
     // Update notifications in localStorage
     localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
 
     // Kalıcı olarak okunmuş bildirimleri sakla
     const readNotificationsJSON = localStorage.getItem('readNotifications');
-    let readNotifications: string[] = [];
+    let readNotifications: Record<string, number> = {};
 
     if (readNotificationsJSON) {
       try {
-        readNotifications = JSON.parse(readNotificationsJSON);
+        // Eski format (string[]) veya yeni format (Record<string, number>) olabilir
+        const parsed = JSON.parse(readNotificationsJSON);
+        
+        if (Array.isArray(parsed)) {
+          // Eski format: string[] -> Record<string, number> dönüşümü
+          console.log('Converting old readNotifications format to new format');
+          for (const oldId of parsed) {
+            readNotifications[oldId] = currentTime; // Şu anki zamanı kullan
+          }
+        } else {
+          // Yeni format: Record<string, number>
+          readNotifications = parsed;
+        }
       } catch (error) {
         console.error('Error parsing read notifications:', error);
       }
     }
 
-    // Eğer bu bildirim daha önce okunmamışsa, listeye ekle
-    if (!readNotifications.includes(id)) {
-      readNotifications.push(id);
-      localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
-      console.log(`Notification ${id} marked as read permanently at ${new Date(currentTime).toLocaleString()}`);
-    }
+    // Bildirimi okundu olarak işaretle ve okunma zamanını kaydet
+    readNotifications[id] = currentTime;
+    localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
+    console.log(`Notification ${id} marked as read permanently at ${new Date(currentTime).toLocaleString()}`);
   };
 
   // Handle notification click
