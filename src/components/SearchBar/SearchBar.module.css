@@ -62,4 +62,9 @@
   .searchInputContainerOpen {
     width: 200px;
   }
+
+  .searchInput {
+    font-size: 16px; /* 16px veya daha büyük font-size mobil tarayıcılarda zoom'u engeller */
+    padding: 4px 8px; /* Daha küçük padding ile yüksekliği dengelemek için */
+  }
 }

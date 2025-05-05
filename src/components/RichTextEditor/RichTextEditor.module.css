@@ -59,6 +59,7 @@
   float: left;
   height: 0;
   pointer-events: none;
+  
 }
 
 .editorContent .ProseMirror img {
