@@ -1,86 +1,38 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import styles from './Header.module.css';
 import NotificationSystem from '@/components/NotificationSystem';
+import SearchBar from '@/components/SearchBar';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Initialize search query from URL on component mount
+  // Handle click outside to close mobile menu
   useEffect(() => {
-    const query = searchParams.get('q');
-    if (query) {
-      setSearchQuery(query);
-      setIsSearchOpen(true);
-    }
-  }, [searchParams]);
-
-  // Handle search input change
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-
-    // Automatically search when input has at least 3 characters
-    if (value.length >= 3 || value.length === 0) {
-      // Only update URL if we're on blog pages
-      if (pathname === '/' || pathname === '/blog' || pathname.startsWith('/blog/')) {
-        // Create new URL with search query
-        const params = new URLSearchParams(searchParams);
-
-        if (value.length >= 3) {
-          params.set('q', value);
-        } else {
-          params.delete('q');
-        }
-
-        // Update URL with search query
-        const newUrl = pathname + (params.toString() ? `?${params.toString()}` : '');
-        router.push(newUrl);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isMobileMenuOpen &&
+        mobileMenuRef.current &&
+        mobileMenuButtonRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node) &&
+        !mobileMenuButtonRef.current.contains(event.target as Node)
+      ) {
+        setIsMobileMenuOpen(false);
       }
-    }
-  };
+    };
 
-  // Handle search form submission
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Only update URL if we're on blog pages
-    if (pathname === '/' || pathname === '/blog' || pathname.startsWith('/blog/')) {
-      // Create new URL with search query
-      const params = new URLSearchParams(searchParams);
-
-      if (searchQuery) {
-        params.set('q', searchQuery);
-      } else {
-        params.delete('q');
-      }
-
-      // Update URL with search query
-      const newUrl = pathname + (params.toString() ? `?${params.toString()}` : '');
-      router.push(newUrl);
-    }
-  };
-
-  // Toggle search input visibility
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-    if (!isSearchOpen) {
-      // Focus the input when opening
-      setTimeout(() => {
-        const input = document.getElementById('search-input');
-        if (input) input.focus();
-      }, 300);
-    }
-  };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
 
   // Define navigation items
   const navItems = [
@@ -154,65 +106,8 @@ export default function Header() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            {/* Search Container */}
-            <div className={styles.searchContainer}>
-              <form onSubmit={handleSearchSubmit}>
-                <div className={`${styles.searchInputContainer} ${isSearchOpen ? styles.searchInputContainerOpen : ''}`}>
-                  <input
-                    id="search-input"
-                    type="text"
-                    className={styles.searchInput}
-                    placeholder="Axtar"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    aria-label="Axtarış"
-                  />
-                </div>
-              </form>
-
-              <button
-                type="button"
-                className={styles.searchButton}
-                onClick={toggleSearch}
-                aria-label={isSearchOpen ? "Bağla" : "Axtarış"}
-              >
-{isSearchOpen ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>Bağla</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>Axtarış</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                )}
-              </button>
-            </div>
+            {/* Search Bar Component */}
+            <SearchBar />
 
             {/* Notification System */}
             <NotificationSystem />
@@ -220,7 +115,8 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               type="button"
-              className={styles.mobileMenuButton}
+              ref={mobileMenuButtonRef}
+              className={`${styles.mobileMenuButton} ${isMobileMenuOpen ? styles.active : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle mobile menu"
             >
@@ -247,7 +143,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className={styles.mobileMenu}>
+        <div className={styles.mobileMenu} ref={mobileMenuRef}>
           <div className={styles.mobileMenuContainer}>
             {renderNavItems(true)}
           </div>

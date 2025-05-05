@@ -40,7 +40,7 @@
 .socialLink {
   display: inline-block;
   padding: 3px 10px;
-  border: 1px solid var(--foreground);
+  border: 1px solid var(--light);
   font-size: 0.75rem;
   color: var(--black);
   text-decoration: none;
@@ -48,7 +48,7 @@
 }
 
 .socialLink:hover {
-  background-color: var(--foreground);
+  background-color: var(--light);
 }
 
 @media (max-width: 768px) {

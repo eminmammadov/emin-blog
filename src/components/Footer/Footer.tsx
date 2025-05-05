@@ -9,7 +9,9 @@ const Footer = () => {
         <div className={styles.footerSection}>
           <h3 className={styles.footerTitle}>/ HAQQINDA</h3>
           <p className={styles.footerText}>
-            Blockchain Developer, Web3 Engineer, AI & EEE.
+            Emin Mammadov müstəqil Blockchain, Web3 mühəndisi və Elektromaqnit elektronika proqram təminatı tərtibatçısıdır. Onun tədqiqat maraqlarına kosmologiyada verilənlər problemlərinə dair tədqiqatlar daxildir.
+
+            O, hazırda Blockchain texnologiyasının problemlərinin həllinə diqqət yetirən Kriptaz Blockchain və elektrik dalğalarını məlumatlara çevirərək yeni nəsil Energyption texnologiyasını yaradan Xoflink üzərində işləyir.
           </p>
         </div>
         
