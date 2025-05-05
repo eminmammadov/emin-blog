@@ -43,8 +43,7 @@
   right: 0;
   width: 300px;
   background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border: 1px solid var(--foreground);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   overflow: hidden;
@@ -154,20 +153,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.notificationIcon {
-  width: 30px;
-  height: 30px;
-  color: #d63384;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 8px;
-  flex-shrink: 0;
-  align-self: center;
-  background-color: #f8e1f4;
-  border-radius: 4px;
 }
 
 .viewAllLink {

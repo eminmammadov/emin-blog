@@ -16,6 +16,7 @@
     "@tiptap/react": "^2.11.9",
     "@tiptap/starter-kit": "^2.11.9",
     "dotenv": "^16.5.0",
+    "lucide-react": "^0.507.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.1",
     "next": "15.3.1",

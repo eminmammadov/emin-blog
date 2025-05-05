@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Check, CheckCheck } from 'lucide-react';
 import styles from './NotificationSystem.module.css';
 
 // Define blog post type
@@ -37,6 +38,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [areAllNotificationsRead, setAreAllNotificationsRead] = useState(true); // Gerçek okunma durumu için
   const router = useRouter();
 
   // Format date for display
@@ -449,6 +451,19 @@ export default function NotificationSystem({ className }: NotificationSystemProp
     return () => clearInterval(checkInterval);
   }, [notifications]);
 
+  // Bildirimlerin okunma durumunu kontrol et
+  useEffect(() => {
+    // Bildirim yoksa, tümü okunmuş kabul et
+    if (notifications.length === 0) {
+      setAreAllNotificationsRead(true);
+      return;
+    }
+
+    // Tüm bildirimlerin okunma durumunu kontrol et
+    const allRead = notifications.every(notification => notification.read);
+    setAreAllNotificationsRead(allRead);
+  }, [notifications]);
+
   // Toggle notification dropdown
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
@@ -466,6 +481,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
 
     setNotifications(updatedNotifications);
     setHasUnreadNotifications(false);
+    setAreAllNotificationsRead(true); // Tüm bildirimlerin okundu olarak işaretlendiğini belirt
 
     // Update notifications in localStorage
     localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
@@ -587,24 +603,12 @@ export default function NotificationSystem({ className }: NotificationSystemProp
             className={styles.markAsReadButton}
             onClick={markAllAsRead}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              style={{ marginRight: '4px' }}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-            Oxundu olaraq işarələ
+            {areAllNotificationsRead ? (
+              <CheckCheck size={16} style={{ marginRight: '4px' }} />
+            ) : (
+              <Check size={16} style={{ marginRight: '4px' }} />
+            )}
+            {areAllNotificationsRead ? 'Oxundu' : 'Oxundu işarələ'}
           </button>
         </div>
 
@@ -633,24 +637,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
                     {notification.date || 'Son paylaşım'}
                   </p>
                 </div>
-                <div className={styles.notificationIcon}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="#d63384"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
-                </div>
+
               </button>
             ))
           )}
