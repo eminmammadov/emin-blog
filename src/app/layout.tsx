@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import LoadingScreen from "@/components/LoadingScreen";
 import { Suspense } from "react";
 
 const dmSans = DM_Sans({
@@ -112,6 +113,9 @@ export default function RootLayout({
         data-new-gr-c-s-check-loaded="14.1233.0"
         data-gr-ext-installed=""
       >
+        <Suspense fallback={<div className="h-screen bg-[#F7F7F3] flex items-center justify-center">Yüklənir...</div>}>
+          <LoadingScreen />
+        </Suspense>
         <Suspense fallback={<div className="h-16 bg-[#F7F7F3]"/>}>
           <Header />
         </Suspense>

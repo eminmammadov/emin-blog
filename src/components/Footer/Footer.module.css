@@ -28,8 +28,9 @@
 .footerText {
   font-size: 0.8rem;
   color: var(--black);
-  max-width: 400px;
+  max-width: 800px;
   line-height: 1.5;
+  margin-right: 2rem;
 }
 
 .socialLinks {
@@ -62,12 +63,17 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 580px) {
   .socialLinks {
     flex-wrap: wrap;
   }
   
   .socialLink {
     padding: 3px 10px;
+  }
+
+  .footerText {
+    max-width: 400px;
+    margin-right: 0rem;
   }
 }
