@@ -11,7 +11,7 @@ const Footer = () => {
           <p className={styles.footerText}>
             Emin Mammadov müstəqil Blockchain, Web3 mühəndisi və Elektromaqnit elektronika proqram təminatı tərtibatçısıdır. Onun tədqiqat maraqlarına kosmologiyada verilənlər problemlərinə dair tədqiqatlar daxildir.
 
-            O, hazırda Blockchain texnologiyasının problemlərinin həllinə diqqət yetirən Kriptaz Blockchain və elektrik dalğalarını məlumatlara çevirərək yeni nəsil Energyption texnologiyasını yaradan Xoflink üzərində işləyir.
+            O, hazırda Blockchain texnologiyasının problemlərinin həllinə diqqət yetirən Kriptaz Blockchain və elektrik dalğalarını məlumatlara çevirərək yeni nəsil Energyption texnologiyasını yaradan Xoftlink üzərində işləyir.
           </p>
         </div>
         
