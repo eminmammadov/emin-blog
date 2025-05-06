@@ -62,6 +62,51 @@ export default function NotificationSystem({ className }: NotificationSystemProp
   const [areAllNotificationsRead, setAreAllNotificationsRead] = useState(true); // Gerçek okunma durumu için
   const router = useRouter();
 
+  // Eski bildirimleri temizleme fonksiyonu
+  const cleanupOldNotifications = useCallback(() => {
+    try {
+      // localStorage'dan mevcut bildirimleri al
+      const storedNotificationsJSON = localStorage.getItem('notifications');
+      if (!storedNotificationsJSON) return;
+
+      const storedNotifications = JSON.parse(storedNotificationsJSON) as NotificationType[];
+      const currentTime = Date.now();
+      const oneHourInMs = 60 * 60 * 1000; // 1 saat (milisaniye cinsinden)
+
+      // 1. Okunmuş ve 1 saatten eski bildirimleri filtrele
+      // 2. Geçersiz blog yazılarına ait bildirimleri filtrele (API'den kontrol et)
+      const filteredNotifications = storedNotifications.filter((notification) => {
+        // Okunmamış bildirimler kalsın
+        if (!notification.read) return true;
+
+        // Okunma zamanı yoksa kalsın
+        if (!notification.readAt) return true;
+
+        // Okunma zamanından bu yana 1 saatten az geçtiyse kalsın
+        return (currentTime - notification.readAt) < oneHourInMs;
+      });
+
+      // Eğer bildirim sayısı değiştiyse, localStorage'ı güncelle
+      if (filteredNotifications.length !== storedNotifications.length) {
+        console.log(`Cleanup: Removed ${storedNotifications.length - filteredNotifications.length} old notifications`);
+        localStorage.setItem('notifications', JSON.stringify(filteredNotifications));
+
+        // Eğer bileşen yüklendiyse, state'i de güncelle
+        setNotifications(filteredNotifications);
+
+        // Okunmamış bildirim var mı kontrol et
+        const hasUnread = filteredNotifications.some(notification => !notification.read);
+        setHasUnreadNotifications(hasUnread);
+
+        // Tüm bildirimlerin okunma durumunu kontrol et
+        const allRead = filteredNotifications.every(notification => notification.read);
+        setAreAllNotificationsRead(allRead);
+      }
+    } catch (error) {
+      console.error('Error cleaning up old notifications:', error);
+    }
+  }, []);
+
   // Format date for display
   const formatDate = useCallback((dateString: string) => {
     try {
@@ -138,8 +183,14 @@ export default function NotificationSystem({ className }: NotificationSystemProp
   // Fetch blog posts and create notifications
   const fetchBlogPosts = useCallback(async () => {
     try {
-      // Fetch blog posts from API
-      const response = await fetch('/api/blogs');
+      // Fetch blog posts from API with cache disabled
+      const response = await fetch('/api/blogs', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      });
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -149,25 +200,40 @@ export default function NotificationSystem({ className }: NotificationSystemProp
       console.log('Fetched blog posts:', blogPosts);
 
       // Get stored notifications
-      const storedNotifications = localStorage.getItem('notifications');
-      let currentNotifications: NotificationType[] = [];
+      const storedNotificationsJSON = localStorage.getItem('notifications');
+      let storedNotifications: NotificationType[] = [];
 
-      if (storedNotifications) {
-        currentNotifications = JSON.parse(storedNotifications);
+      if (storedNotificationsJSON) {
+        try {
+          storedNotifications = JSON.parse(storedNotificationsJSON);
+          console.log('Stored notifications:', storedNotifications);
+        } catch (error) {
+          console.error('Error parsing stored notifications:', error);
+        }
       }
 
-      // Create new notifications for new blog posts
+      // Mevcut bildirimlerdeki ID'leri al
+      const existingNotificationIds = storedNotifications.map(notification => notification.id);
+      console.log('Existing notification IDs:', existingNotificationIds);
+
+      // Son ziyaret zamanını al
       const lastVisit = localStorage.getItem('lastVisit') || '0';
       const lastVisitDate = new Date(Number.parseInt(lastVisit, 10));
+      console.log('Last visit date:', lastVisitDate.toISOString());
 
-      // Update last visit time
-      localStorage.setItem('lastVisit', Date.now().toString());
-
-      // Filter blog posts that were published after the last visit
+      // Yeni blog yazılarını tespit et (ID'si mevcut bildirimlerde olmayan veya son ziyaretten sonra yayınlanan)
       const newPosts = blogPosts.filter((post: BlogPostType) => {
-        // Handle both MongoDB date format and string date format
+        const postId = post._id || post.slug;
         const postDate = new Date(post.date);
-        return postDate > lastVisitDate;
+
+        // ID mevcut bildirimlerde yoksa VEYA son ziyaretten sonra yayınlanmışsa
+        const isNew = !existingNotificationIds.includes(postId) || postDate > lastVisitDate;
+
+        if (isNew) {
+          console.log(`New post detected: ${post.title}, date: ${post.date}, id: ${postId}`);
+        }
+
+        return isNew;
       });
 
       console.log('New posts since last visit:', newPosts);
@@ -177,12 +243,12 @@ export default function NotificationSystem({ className }: NotificationSystemProp
         id: post._id || post.slug,
         message: post.title,
         date: formatDate(post.date),
-        read: false,
+        read: false, // Yeni bildirimler okunmamış olarak işaretlenir
         slug: post.slug
       }));
 
       // Combine existing and new notifications
-      const updatedNotifications = [...newNotifications, ...currentNotifications];
+      const updatedNotifications = [...newNotifications, ...storedNotifications];
 
       // Limit to 5 notifications
       const limitedNotifications = updatedNotifications.slice(0, 5);
@@ -195,110 +261,30 @@ export default function NotificationSystem({ className }: NotificationSystemProp
 
       // Save to localStorage
       localStorage.setItem('notifications', JSON.stringify(limitedNotifications));
+
+      // Yeni bildirimler oluşturulduktan sonra son ziyaret zamanını güncelle
+      // Sadece yeni blog yazısı varsa son ziyaret zamanını güncelle
+      if (newPosts.length > 0) {
+        localStorage.setItem('lastVisit', Date.now().toString());
+        console.log('Updated last visit time:', new Date().toISOString());
+      }
     } catch (error) {
       console.error('Error fetching blog posts:', error);
+      // Fallback to stored notifications
+      const storedNotifications = localStorage.getItem('notifications');
 
-      // Try to get blog posts from MDX files if MongoDB fetch fails
-      try {
-        // Fallback to fetch from a different endpoint that gets MDX files
-        const mdxResponse = await fetch('/api/mdx-blogs');
-
-        if (!mdxResponse.ok) {
-          throw new Error(`MDX API error: ${mdxResponse.status}`);
-        }
-
-        const mdxBlogPosts = await mdxResponse.json();
-        console.log('Fetched MDX blog posts:', mdxBlogPosts);
-
-        // Get stored notifications
-        const storedNotifications = localStorage.getItem('notifications');
-        let currentNotifications: NotificationType[] = [];
-
-        if (storedNotifications) {
-          currentNotifications = JSON.parse(storedNotifications);
-        }
-
-        // Create new notifications for new blog posts
-        const lastVisit = localStorage.getItem('lastVisit') || '0';
-        const lastVisitDate = new Date(Number.parseInt(lastVisit, 10));
-
-        // Update last visit time
-        localStorage.setItem('lastVisit', Date.now().toString());
-
-        // Filter blog posts that were published after the last visit
-        const newPosts = mdxBlogPosts.filter((post: BlogPostType) => {
-          const postDate = new Date(post.date);
-          return postDate > lastVisitDate;
-        });
-
-        // Create notifications for new posts
-        const newNotifications = newPosts.map((post: BlogPostType) => ({
-          id: post.slug,
-          message: post.title,
-          date: formatDate(post.date),
-          read: false,
-          slug: post.slug
-        }));
-
-        // Combine existing and new notifications
-        const updatedNotifications = [...newNotifications, ...currentNotifications];
-
-        // Limit to 5 notifications
-        const limitedNotifications = updatedNotifications.slice(0, 5);
-
-        setNotifications(limitedNotifications);
+      if (storedNotifications) {
+        const parsedNotifications = JSON.parse(storedNotifications);
+        setNotifications(parsedNotifications.slice(0, 5)); // Limit to 5
 
         // Check if there are any unread notifications
-        const unreadExists = limitedNotifications.some(notification => !notification.read);
+        const unreadExists = parsedNotifications.some((notification: NotificationType) => !notification.read);
         setHasUnreadNotifications(unreadExists);
-
-        // Save to localStorage
-        localStorage.setItem('notifications', JSON.stringify(limitedNotifications));
-      } catch (mdxError) {
-        console.error('Error fetching MDX blog posts:', mdxError);
-
-        // Fallback to stored notifications or demo notifications
-        const storedNotifications = localStorage.getItem('notifications');
-
-        if (storedNotifications) {
-          const parsedNotifications = JSON.parse(storedNotifications);
-          setNotifications(parsedNotifications.slice(0, 5)); // Limit to 5
-
-          // Check if there are any unread notifications
-          const unreadExists = parsedNotifications.some((notification: NotificationType) => !notification.read);
-          setHasUnreadNotifications(unreadExists);
-        } else {
-          // Veritabanından blog yazılarını alamadık, bu yüzden API'den tekrar deniyoruz
-          try {
-            const response = await fetch('/api/blogs');
-            if (response.ok) {
-              const blogPosts = await response.json();
-              // En son 5 blog yazısını al
-              const latestPosts = blogPosts.slice(0, 5);
-
-              // Blog yazılarından bildirimler oluştur
-              const blogNotifications = latestPosts.map((post: BlogPostType) => ({
-                id: post._id || post.slug,
-                message: post.title,
-                date: formatDate(post.date),
-                read: false,
-                slug: post.slug
-              }));
-
-              setNotifications(blogNotifications);
-              setHasUnreadNotifications(true);
-              localStorage.setItem('notifications', JSON.stringify(blogNotifications));
-              return;
-            }
-          } catch (error) {
-            console.error('Error fetching blogs for notifications:', error);
-          }
-
-          // Blog yazısı yoksa boş bildirim listesi göster
-          setNotifications([]);
-          setHasUnreadNotifications(false);
-          localStorage.setItem('notifications', JSON.stringify([]));
-        }
+      } else {
+        // Blog yazısı yoksa boş bildirim listesi göster
+        setNotifications([]);
+        setHasUnreadNotifications(false);
+        localStorage.setItem('notifications', JSON.stringify([]));
       }
     }
   }, [formatDate]);
@@ -307,72 +293,114 @@ export default function NotificationSystem({ className }: NotificationSystemProp
   useEffect(() => {
     // Check if we're in the browser
     if (typeof window !== 'undefined') {
+      // Daha önce okunmuş bildirimleri localStorage'dan al
+      const readNotificationsJSON = localStorage.getItem('readNotifications');
+      let readNotifications: Record<string, number> = {}; // ID -> okunma zamanı (timestamp)
+
+      if (readNotificationsJSON) {
+        try {
+          // Eski format (string[]) veya yeni format (Record<string, number>) olabilir
+          const parsed = JSON.parse(readNotificationsJSON);
+
+          if (Array.isArray(parsed)) {
+            // Eski format: string[] -> Record<string, number> dönüşümü
+            console.log('Converting old readNotifications format to new format');
+            for (const id of parsed) {
+              readNotifications[id] = Date.now(); // Şu anki zamanı kullan
+            }
+            // Yeni formatı localStorage'a kaydet
+            localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
+          } else {
+            // Yeni format: Record<string, number>
+            readNotifications = parsed;
+          }
+
+          console.log('Read notifications loaded from localStorage:', readNotifications);
+        } catch (error) {
+          console.error('Error parsing read notifications from localStorage:', error);
+        }
+      }
+
+      // Sayfa yüklendiğinde eski bildirimleri temizle
+      cleanupOldNotifications();
+
       // Doğrudan API'den blog yazılarını al
       const fetchDirectFromAPI = async () => {
         try {
-          const response = await fetch('/api/blogs');
+          // Cache'i devre dışı bırakmak için no-cache ve no-store parametrelerini ekleyelim
+          const response = await fetch('/api/blogs', {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache'
+            }
+          });
+
           if (response.ok) {
             const blogPosts = await response.json();
             console.log('API response blog posts:', blogPosts);
 
-            // En son 5 blog yazısını al
-            const latestPosts = blogPosts.slice(0, 5);
-            console.log('Latest 5 posts:', latestPosts);
+            // Get stored notifications
+            const storedNotificationsJSON = localStorage.getItem('notifications');
+            let storedNotifications: NotificationType[] = [];
 
-            // Blog yazılarının tarih formatını kontrol et
-            latestPosts.forEach((post: BlogPostType, index: number) => {
-              console.log(`Post ${index} date:`, post.date, 'Type:', typeof post.date);
-            });
-
-            // Daha önce okunmuş bildirimleri localStorage'dan al
-            const readNotificationsJSON = localStorage.getItem('readNotifications');
-            let readNotifications: Record<string, number> = {}; // ID -> okunma zamanı (timestamp)
-
-            if (readNotificationsJSON) {
+            if (storedNotificationsJSON) {
               try {
-                // Eski format (string[]) veya yeni format (Record<string, number>) olabilir
-                const parsed = JSON.parse(readNotificationsJSON);
-
-                if (Array.isArray(parsed)) {
-                  // Eski format: string[] -> Record<string, number> dönüşümü
-                  console.log('Converting old readNotifications format to new format');
-                  for (const id of parsed) {
-                    readNotifications[id] = Date.now(); // Şu anki zamanı kullan
-                  }
-                  // Yeni formatı localStorage'a kaydet
-                  localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
-                } else {
-                  // Yeni format: Record<string, number>
-                  readNotifications = parsed;
-                }
-
-                console.log('Read notifications loaded from localStorage:', readNotifications);
+                storedNotifications = JSON.parse(storedNotificationsJSON);
+                console.log('Stored notifications:', storedNotifications);
               } catch (error) {
-                console.error('Error parsing read notifications from localStorage:', error);
+                console.error('Error parsing stored notifications:', error);
               }
             }
 
-            // Blog yazılarından bildirimler oluştur
-            const blogNotifications = latestPosts.map((post: BlogPostType) => {
-              const postId = post._id || post.slug;
-              // Daha önce okunmuş mu kontrol et
-              const isRead = postId in readNotifications;
+            // Mevcut bildirimlerdeki ID'leri al
+            const existingNotificationIds = storedNotifications.map(notification => notification.id);
+            console.log('Existing notification IDs:', existingNotificationIds);
 
-              // Okunma zamanını al
-              let readAt: number | undefined = undefined;
-              if (isRead) {
-                readAt = readNotifications[postId];
+            // Son ziyaret zamanını al
+            const lastVisit = localStorage.getItem('lastVisit') || '0';
+            const lastVisitDate = new Date(Number.parseInt(lastVisit, 10));
+            console.log('Last visit date:', lastVisitDate.toISOString());
+
+            // Yeni blog yazılarını tespit et (ID'si mevcut bildirimlerde olmayan veya son ziyaretten sonra yayınlanan)
+            const newPosts = blogPosts.filter((post: BlogPostType) => {
+              const postId = post._id || post.slug;
+              const postDate = new Date(post.date);
+
+              // ID mevcut bildirimlerde yoksa VEYA son ziyaretten sonra yayınlanmışsa
+              const isNew = !existingNotificationIds.includes(postId) || postDate > lastVisitDate;
+
+              if (isNew) {
+                console.log(`New post detected: ${post.title}, date: ${post.date}, id: ${postId}`);
               }
 
-              console.log(`Creating notification for post: ${post.title}, using date: ${post.date}, read: ${isRead}, readAt: ${readAt}`);
+              return isNew;
+            });
 
+            console.log('New posts detected:', newPosts.length);
+
+            // Yeni blog yazıları için bildirimler oluştur
+            const newNotifications = newPosts.map((post: BlogPostType) => {
+              const postId = post._id || post.slug;
               return {
                 id: postId,
                 message: post.title,
                 date: formatDate(post.date),
-                read: isRead, // Daha önce okunmuşsa true, okunmamışsa false
-                readAt: isRead ? readAt : undefined, // Okunmuşsa okunma zamanını ekle
+                read: false, // Yeni bildirimler okunmamış olarak işaretlenir
                 slug: post.slug
+              };
+            });
+
+            // Mevcut bildirimlerle yeni bildirimleri birleştir
+            const combinedNotifications = [...newNotifications, ...storedNotifications];
+
+            // Okunmuş bildirimleri işaretle
+            const updatedNotifications = combinedNotifications.map(notification => {
+              const isRead = notification.id in readNotifications;
+              return {
+                ...notification,
+                read: isRead,
+                readAt: isRead ? readNotifications[notification.id] : undefined
               };
             });
 
@@ -380,7 +408,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
             const currentTime = Date.now();
             const oneHourInMs = 60 * 60 * 1000; // 1 saat (milisaniye cinsinden)
 
-            const filteredNotifications = blogNotifications.filter((notification: NotificationType) => {
+            const filteredNotifications = updatedNotifications.filter((notification: NotificationType) => {
               // Okunmamış bildirimler kalsın
               if (!notification.read) return true;
 
@@ -391,18 +419,27 @@ export default function NotificationSystem({ className }: NotificationSystemProp
               return (currentTime - notification.readAt) < oneHourInMs;
             });
 
-            console.log(`Filtered out ${blogNotifications.length - filteredNotifications.length} read notifications older than 1 hour`);
+            // En fazla 5 bildirim göster
+            const limitedNotifications = filteredNotifications.slice(0, 5);
+
+            console.log('Final notifications:', limitedNotifications);
 
             // Okunmamış bildirim var mı kontrol et
-            const hasUnread = filteredNotifications.some((notification: NotificationType) => !notification.read);
+            const hasUnread = limitedNotifications.some((notification: NotificationType) => !notification.read);
 
-            setNotifications(filteredNotifications);
+            setNotifications(limitedNotifications);
             setHasUnreadNotifications(hasUnread);
-            localStorage.setItem('notifications', JSON.stringify(filteredNotifications));
+            localStorage.setItem('notifications', JSON.stringify(limitedNotifications));
 
             // Tüm bildirimlerin okunma durumunu kontrol et
-            const allRead = filteredNotifications.every((notification: NotificationType) => notification.read);
+            const allRead = limitedNotifications.every(notification => notification.read);
             setAreAllNotificationsRead(allRead);
+
+            // Son ziyaret zamanını güncelle (sadece bildirimler işlendikten sonra)
+            if (newPosts.length > 0) {
+              console.log('Updating last visit time due to new posts');
+              localStorage.setItem('lastVisit', Date.now().toString());
+            }
 
             return;
           }
@@ -418,7 +455,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
 
       fetchDirectFromAPI();
     }
-  }, [fetchBlogPosts, formatDate]);
+  }, [fetchBlogPosts, formatDate, cleanupOldNotifications]);
 
   // Close notification dropdown when clicking outside
   useEffect(() => {
@@ -440,44 +477,17 @@ export default function NotificationSystem({ className }: NotificationSystemProp
 
   // Okunmuş bildirimleri 1 saat sonra kaldır
   useEffect(() => {
-    // Her 5 dakikada bir kontrol et
+    // Sayfa yüklendiğinde hemen bir kez çalıştır
+    cleanupOldNotifications();
+
+    // Her 1 dakikada bir kontrol et (daha sık kontrol edelim)
     const checkInterval = setInterval(() => {
-      if (notifications.length > 0) {
-        const currentTime = Date.now();
-        const oneHourInMs = 60 * 60 * 1000; // 1 saat (milisaniye cinsinden)
-
-        // Okunmuş ve 1 saatten fazla zaman geçmiş bildirimleri filtrele
-        const filteredNotifications = notifications.filter((notification: NotificationType) => {
-          // Okunmamış bildirimler kalsın
-          if (!notification.read) return true;
-
-          // Okunma zamanı yoksa kalsın
-          if (!notification.readAt) return true;
-
-          // Okunma zamanından bu yana 1 saatten az geçtiyse kalsın
-          return (currentTime - notification.readAt) < oneHourInMs;
-        });
-
-        // Eğer bildirim sayısı değiştiyse, state'i ve localStorage'ı güncelle
-        if (filteredNotifications.length !== notifications.length) {
-          console.log(`Removing ${notifications.length - filteredNotifications.length} read notifications older than 1 hour`);
-          setNotifications(filteredNotifications);
-          localStorage.setItem('notifications', JSON.stringify(filteredNotifications));
-
-          // Okunmamış bildirim var mı kontrol et
-          const hasUnread = filteredNotifications.some(notification => !notification.read);
-          setHasUnreadNotifications(hasUnread);
-
-          // Tüm bildirimlerin okunma durumunu kontrol et
-          const allRead = filteredNotifications.every(notification => notification.read);
-          setAreAllNotificationsRead(allRead);
-        }
-      }
-    }, 5 * 60 * 1000); // 5 dakikada bir kontrol et
+      cleanupOldNotifications();
+    }, 60 * 1000); // 1 dakikada bir kontrol et
 
     // Component unmount olduğunda interval'i temizle
     return () => clearInterval(checkInterval);
-  }, [notifications]);
+  }, [cleanupOldNotifications]);
 
   // Bildirimlerin okunma durumunu kontrol et
   useEffect(() => {
@@ -491,6 +501,37 @@ export default function NotificationSystem({ className }: NotificationSystemProp
     const allRead = notifications.every(notification => notification.read);
     setAreAllNotificationsRead(allRead);
   }, [notifications]);
+
+  // Blog silme olayını dinle
+  useEffect(() => {
+    // Blog silme olayını işleyen fonksiyon
+    const handleBlogDeleted = (event: CustomEvent) => {
+      const { slug, updatedNotifications } = event.detail;
+      console.log(`Blog deleted event received for slug: ${slug}`);
+
+      // Bildirimleri güncelle
+      setNotifications(updatedNotifications);
+
+      // Okunmamış bildirim var mı kontrol et
+      const hasUnread = updatedNotifications.some((notification: NotificationType) => !notification.read);
+      setHasUnreadNotifications(hasUnread);
+
+      // Tüm bildirimlerin okunma durumunu kontrol et
+      const allRead = updatedNotifications.every((notification: NotificationType) => notification.read);
+      setAreAllNotificationsRead(allRead);
+
+      // Eski bildirimleri temizle
+      cleanupOldNotifications();
+    };
+
+    // Olayı dinle
+    window.addEventListener('blogDeleted', handleBlogDeleted as EventListener);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('blogDeleted', handleBlogDeleted as EventListener);
+    };
+  }, [cleanupOldNotifications]);
 
   // Toggle notification dropdown
   const toggleNotification = () => {

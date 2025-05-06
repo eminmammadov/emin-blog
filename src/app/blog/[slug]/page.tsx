@@ -24,10 +24,10 @@ const BLOG_POST_TEXTS = {
     CATEGORY: 'KATEQORİYA:',
     SHARE: 'PAYLAŞ:'
   },
-  BACK_BUTTON: '← Geriyə get',
+  BACK_BUTTON: '← Geriyə qayıt',
   ERROR: {
-    TITLE: 'Blog yazısı yüklenirken bir hata oluştu',
-    MESSAGE: 'Lütfen daha sonra tekrar deneyin.'
+    TITLE: 'Bloq yazısı yüklənərkən bir xəta yarandı',
+    MESSAGE: 'Xahiş edirik bir qədər sonra təkrar yoxlayın.'
   }
 };
 

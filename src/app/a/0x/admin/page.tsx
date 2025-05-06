@@ -4,6 +4,16 @@ import { useState, useEffect } from 'react';
 import styles from './admin.module.css';
 import Link from 'next/link';
 import type { BlogPost } from '@/types/blog';
+
+// Notification tipi için arayüz
+interface NotificationType {
+  id: string;
+  message: string;
+  date: string;
+  read: boolean;
+  readAt?: number;
+  slug: string;
+}
 import dynamic from 'next/dynamic';
 
 // Admin sayfası için statik metinler
@@ -114,24 +124,8 @@ export default function AdminPage() {
 
   // Fetch all blogs
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/blogs');
-        if (!response.ok) {
-          throw new Error(ADMIN_TEXTS.STATUS.ERROR_FETCH);
-        }
-        const data = await response.json();
-        setBlogs(data);
-      } catch (error) {
-        console.error('Error fetching blogs:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (activeTab === 'list') {
-      fetchBlogs();
+      fetchBlogs(); // Dışarıda tanımladığımız güncellenmiş fetchBlogs fonksiyonunu kullan
     }
   }, [activeTab]);
 
@@ -160,12 +154,28 @@ export default function AdminPage() {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/blogs');
+      // Cache'i devre dışı bırakmak için no-cache ve no-store parametrelerini ekleyelim
+      const response = await fetch('/api/blogs', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      });
+
       if (!response.ok) {
         throw new Error(ADMIN_TEXTS.STATUS.ERROR_FETCH);
       }
+
       const data = await response.json();
-      setBlogs(data);
+      console.log('Fetched blogs:', data); // Gelen verileri kontrol edelim
+
+      if (Array.isArray(data)) {
+        setBlogs(data);
+      } else {
+        console.error('API did not return an array:', data);
+        setBlogs([]);
+      }
     } catch (error) {
       console.error('Error fetching blogs:', error);
     } finally {
@@ -193,6 +203,9 @@ export default function AdminPage() {
         throw new Error(data.error || ADMIN_TEXTS.STATUS.ERROR_DELETE);
       }
 
+      // Blog silindikten sonra bildirimleri güncelle
+      updateNotificationsAfterDelete(slug);
+
       setStatus({ message: ADMIN_TEXTS.STATUS.SUCCESS_DELETE, type: 'success' });
       fetchBlogs();
     } catch (error) {
@@ -203,6 +216,44 @@ export default function AdminPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Silinen blog yazısı için bildirimleri güncelle
+  const updateNotificationsAfterDelete = (slug: string) => {
+    try {
+      // localStorage'dan mevcut bildirimleri al
+      const storedNotificationsJSON = localStorage.getItem('notifications');
+      if (!storedNotificationsJSON) return;
+
+      const storedNotifications = JSON.parse(storedNotificationsJSON) as NotificationType[];
+
+      // Silinen blog yazısına ait bildirimleri filtrele
+      const updatedNotifications = storedNotifications.filter(
+        (notification: NotificationType) => notification.slug !== slug && notification.id !== slug
+      );
+
+      console.log(`Removed notifications for deleted blog: ${slug}`);
+      console.log('Updated notifications:', updatedNotifications);
+
+      // Güncellenmiş bildirimleri localStorage'a kaydet
+      localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+
+      // Eğer bildirim sayısı değiştiyse, kullanıcıya bildir
+      if (updatedNotifications.length !== storedNotifications.length) {
+        console.log(`Removed ${storedNotifications.length - updatedNotifications.length} notifications for deleted blog`);
+
+        // Özel olay tetikle - NotificationSystem bileşeni bu olayı dinleyecek
+        const event = new CustomEvent('blogDeleted', {
+          detail: {
+            slug,
+            updatedNotifications
+          }
+        });
+        window.dispatchEvent(event);
+      }
+    } catch (error) {
+      console.error('Error updating notifications after blog delete:', error);
     }
   };
 
@@ -420,10 +471,10 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   {blogs.map((blog) => (
-                    <tr key={blog.slug}>
-                      <td>{blog.title}</td>
-                      <td>{blog.date}</td>
-                      <td>{blog.category}</td>
+                    <tr key={blog.slug || blog._id}>
+                      <td>{blog.title || 'Başlıksız'}</td>
+                      <td>{blog.date || 'Tarih yok'}</td>
+                      <td>{blog.category || (blog.categories && blog.categories.length > 0 ? blog.categories[0] : 'Kategori yok')}</td>
                       <td className={styles.actions}>
                         <Link href={`/blog/${blog.slug}`} target="_blank" className={styles.viewButton}>
                           {ADMIN_TEXTS.BLOG_LIST.ACTIONS.VIEW}

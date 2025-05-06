@@ -26,10 +26,17 @@ export async function GET() {
     const blogs = await Blog.find({}).sort({ date: -1 });
     console.log(`Found ${blogs.length} blogs in database`);
 
-    // Add cache headers to prevent rate limiting during builds
+    // Blog verilerini detaylı olarak logla
+    if (blogs.length > 0) {
+      console.log('First blog sample:', JSON.stringify(blogs[0]));
+    }
+
+    // Admin paneli için cache'leme yapmayalım
     return NextResponse.json(blogs, {
       headers: {
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       },
     });
   } catch (error) {

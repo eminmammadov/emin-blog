@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import Blog from '@/models/Blog';
 
@@ -48,8 +48,8 @@ export async function PUT(
     if (typeof body.categories === 'string') {
       categoriesArray = body.categories
         .split(',')
-        .map(cat => cat.trim())
-        .filter(cat => cat);
+        .map((cat: string) => cat.trim())
+        .filter((cat: unknown) => cat);
     }
     
     // Set the first category as the main category
