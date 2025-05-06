@@ -18,8 +18,8 @@ const HOME_PAGE_TEXTS = {
   LOADING: 'Yüklənir...',
   VIEW_ALL: 'Bütün Bloqlar',
   ERROR: {
-    TITLE: 'Blog yazıları yüklenirken bir hata oluştu',
-    MESSAGE: 'Lütfen daha sonra tekrar deneyin.'
+    TITLE: 'Blog yazıları yüklənərkən bir xəta baş verdi',
+    MESSAGE: 'Xahiş edirik bir qədər sonra təkrar yoxlayın.'
   }
 };
 
