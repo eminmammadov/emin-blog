@@ -19,35 +19,49 @@ const connectDB = async () => {
   }
 };
 
+// This prevents Next.js from trying to statically generate this page during build
+export const dynamic = 'force-dynamic';
+
 export default async function ShortLinkRedirect({ params }: { params: { hash: string } }) {
+  // Validate hash parameter to prevent undefined errors
+  if (!params || !params.hash) {
+    console.error('Invalid hash parameter:', params);
+    redirect('/blog');
+  }
+
   try {
     await connectDB();
-    
-    // Next.js 15.3.1 requires awaiting params object itself
-    const resolvedParams = await params;
-    const hash = `0x${resolvedParams.hash}`;
-    
+
+    const hash = `0x${params.hash}`;
+
     console.log(`Resolving short link: ${hash}`);
-    
+
     // Tüm blog yazılarını getir
     const blogs = await Blog.find({});
-    
+
+    if (!blogs || blogs.length === 0) {
+      console.log('No blogs found when resolving short link');
+      redirect('/blog');
+    }
+
     // Her blog için kısa link oluştur ve eşleşeni bul
     for (const blog of blogs) {
+      if (!blog || !blog.slug) continue; // Skip invalid blog entries
+
       const blogShortLink = generateShortLink(blog.slug);
-      
+
       if (blogShortLink === hash) {
         // Eşleşen blog bulundu, yönlendir
         console.log(`Short link ${hash} resolved to: ${blog.slug}`);
         redirect(`/blog/${blog.slug}`);
       }
     }
-    
+
     // Eşleşen blog bulunamadı
     console.log(`Short link not found: ${hash}`);
     redirect('/blog');
   } catch (error) {
-    console.error(`Error resolving short link: ${params.hash}`, error);
+    console.error(`Error resolving short link: ${params?.hash}`, error);
     redirect('/blog');
   }
 }

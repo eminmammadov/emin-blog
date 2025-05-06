@@ -1,24 +1,24 @@
 .editorContainer {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--foreground);
   border-radius: 4px;
   overflow: hidden;
-  background-color: white;
+  background-color: var(--light);
 }
 
 .toolbar {
   display: flex;
   flex-wrap: wrap;
   padding: 8px;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: #f8f8f8;
+  border-bottom: 1px solid var(--foreground);
+  background-color: var(--footer);
 }
 
 .toolbar button {
   margin-right: 5px;
   margin-bottom: 5px;
   padding: 6px 10px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
+  background-color: var(--light);
+  border: 1px solid var(--foreground);
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -28,12 +28,12 @@
 }
 
 .toolbar button:hover {
-  background-color: #f0f0f0;
+  background-color: var(--hover);
 }
 
 .toolbar button.isActive {
-  background-color: #e6e9e4;
-  border-color: #ccc;
+  background-color: var(--foreground);
+  border-color: var(--gray);
 }
 
 .editorContent {
@@ -54,12 +54,12 @@
 }
 
 .editorContent .ProseMirror p.is-editor-empty:first-child::before {
-  color: #adb5bd;
+  color: var(--gray);
   content: attr(data-placeholder);
   float: left;
   height: 0;
   pointer-events: none;
-  
+
 }
 
 .editorContent .ProseMirror img {
@@ -69,7 +69,7 @@
 }
 
 .editorContent .ProseMirror blockquote {
-  border-left: 3px solid #e0e0e0;
+  border-left: 3px solid var(--foreground);
   padding-left: 1em;
   margin-left: 0;
   margin-right: 0;
@@ -77,7 +77,7 @@
 }
 
 .editorContent .ProseMirror pre {
-  background-color: #f8f8f8;
+  background-color: var(--footer);
   padding: 0.75em 1em;
   border-radius: 4px;
   overflow-x: auto;
@@ -100,7 +100,7 @@
 }
 
 .editorContent .ProseMirror a {
-  color: #0c5460;
+  color: var(--blue);
   text-decoration: underline;
 }
 
@@ -108,7 +108,7 @@
   .toolbar {
     padding: 5px;
   }
-  
+
   .toolbar button {
     padding: 4px 8px;
     font-size: 12px;

@@ -26,7 +26,12 @@ export async function GET() {
     const blogs = await Blog.find({}).sort({ date: -1 });
     console.log(`Found ${blogs.length} blogs in database`);
 
-    return NextResponse.json(blogs);
+    // Add cache headers to prevent rate limiting during builds
+    return NextResponse.json(blogs, {
+      headers: {
+        'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
   } catch (error) {
     console.error('Error fetching blogs:', error);
     return NextResponse.json(

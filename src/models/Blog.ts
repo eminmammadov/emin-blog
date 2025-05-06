@@ -29,5 +29,5 @@ const BlogSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-// Prevent overwrite model error in development due to hot reloading
+// İnkişaf mühitində isti yükləmə səbəbindən modelin yenidən yazılmasının qarşısını alın
 export default mongoose.models.Blog || mongoose.model<IBlog>('Blog', BlogSchema);

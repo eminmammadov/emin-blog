@@ -1,5 +1,5 @@
 /**
- * Site URL'sini döndürür
+ * Site URL'sini döndər
  * @returns Site URL'si
  */
 export function getSiteUrl(): string {
@@ -7,7 +7,7 @@ export function getSiteUrl(): string {
 }
 
 /**
- * Tam URL oluşturur
+ * Tam URL yarad
  * @param path URL yolu
  * @returns Tam URL
  */

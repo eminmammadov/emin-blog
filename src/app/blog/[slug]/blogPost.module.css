@@ -1,5 +1,5 @@
 .blogPostContainer {
-  max-width: 1000px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 30px 16px;
 }
@@ -24,16 +24,16 @@
 .sectionTitle {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #333;
+  color: var(--gray);
   margin-bottom: 20px;
   text-transform: uppercase;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid var(--black);
   padding-bottom: 8px;
 }
 
 .metadataSection {
   grid-column: 1 / 2;
-  background-color: #f8f9f7;
+  background-color: var(--footer);
   max-width: 400px;
 }
 
@@ -46,7 +46,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px dotted #ccc;
+  border-bottom: 1px dotted var(--foreground);
   padding-bottom: 4px;
   margin-top: 4px;
 }
@@ -54,7 +54,7 @@
 .metadataLabel {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #333;
+  color: var(--gray);
   width: 120px;
   text-align: left;
 }
@@ -77,7 +77,7 @@
   display: inline-block;
   padding: 4px 8px;
   background-color: transparent;
-  border: 1px solid #333;
+  border: 1px solid var(--gray);
   font-size: 0.875rem;
   color: var(--black);
   text-decoration: none;
@@ -88,7 +88,7 @@
 }
 
 .shareButton:hover {
-  background-color: #e0e0e0;
+  background-color: var(--hover);
 }
 
 .articleSection {
@@ -139,7 +139,7 @@
 }
 
 .articleContent a {
-  color: #0070f3;
+  color: var(--blue);
   text-decoration: none;
 }
 
@@ -148,7 +148,7 @@
 }
 
 .articleContent blockquote {
-  border-left: 4px solid #e0e0e0;
+  border-left: 4px solid var(--foreground);
   padding-left: 16px;
   margin-left: 0;
   margin-right: 0;
@@ -156,14 +156,14 @@
 }
 
 .articleContent code {
-  background-color: #f5f5f5;
+  background-color: var(--footer);
   padding: 2px 4px;
   border-radius: 4px;
   font-family: monospace;
 }
 
 .articleContent pre {
-  background-color: #f5f5f5;
+  background-color: var(--footer);
   padding: 16px;
   border-radius: 4px;
   overflow-x: auto;
@@ -183,7 +183,7 @@
 
 .articleContent hr {
   border: none;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--foreground);
   margin: 32px 0;
 }
 

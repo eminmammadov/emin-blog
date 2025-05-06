@@ -13,29 +13,29 @@ export default function ShareButtons({ title, slug }: ShareButtonsProps) {
   const handleTwitterShare = () => {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://emin-blog.vercel.app';
 
-    // Kısa URL oluştur
+    // Qısa URL yaradılır
     const shortUrl = getShortUrl(siteUrl, slug);
 
-    // Twitter için paylaşım URL'si
+    // Twitter üçün paylaşım URL-i
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title} via @eminmammadov`)}&url=${encodeURIComponent(shortUrl)}`;
 
-    // Mini pencere açalım
+    // Kiçik pəncərə açaq
     window.open(twitterUrl, 'twitter-share', 'width=550,height=435');
     return false;
   };
 
   const handleLinkedInShare = () => {
-    // LinkedIn için doğrudan paylaşım yöntemi
+    // LinkedIn üçün birbaşa paylaşım metodu
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://emin-blog.vercel.app';
 
-    // Kısa URL oluştur
+    // Qısa URL yaradılır
     const shortUrl = getShortUrl(siteUrl, slug);
 
-    // Doğrudan LinkedIn'in paylaşım sayfasına yönlendir
-    // Bu, kullanıcının LinkedIn'e giriş yapmasını ve paylaşım yapmasını sağlar
+    // Birbaşa LinkedIn-in paylaşım səhifəsinə yönləndir
+    // Bu, istifadəçinin LinkedIn-ə daxil olmasını və paylaşım etməsini təmin edir
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(`${title} via @eminmammadov ${shortUrl}`)}`;
 
-    // Yeni bir sekmede açalım
+    // Yeni bir sekmədə açaq
     window.open(linkedinUrl, '_blank');
     return false;
   };

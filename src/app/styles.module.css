@@ -23,7 +23,7 @@
   margin: 20px auto;
   max-width: 600px;
   background-color: var(--background);
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--foreground);
 }
 
 .errorContainer h2 {
@@ -34,5 +34,5 @@
 
 .errorContainer p {
   font-size: 1rem;
-  color: #666;
+  color: var(--gray);
 }

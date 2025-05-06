@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import styles from './SearchBar.module.css';
 
-// SearchBar bileşeni için statik metinler
+// SearchBar komponenti üçün statik mətnlər
 const SEARCH_BAR_TEXTS = {
   PLACEHOLDER: 'Axtar',
   ARIA_LABELS: {
@@ -28,7 +28,7 @@ export default function SearchBar({ className }: SearchBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Initialize search query from URL on component mount
+  // Komponent yüklənəndə URL-dən axtarış sorğusunu başlat
   useEffect(() => {
     const query = searchParams.get('q');
     if (query) {
@@ -37,16 +37,16 @@ export default function SearchBar({ className }: SearchBarProps) {
     }
   }, [searchParams]);
 
-  // Handle search input change
+  // Axtarış girişində dəyişiklikləri idarə et
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
 
-    // Automatically search when input has at least 3 characters
+    // Girişdə ən azı 3 simvol olduqda avtomatik axtarış et
     if (value.length >= 3 || value.length === 0) {
-      // Only update URL if we're on blog pages
+      // Yalnız blog səhifələrində URL-i yenilə
       if (pathname === '/' || pathname === '/blog' || pathname.startsWith('/blog/')) {
-        // Create new URL with search query
+        // Axtarış sorğusu ilə yeni URL yarat
         const params = new URLSearchParams(searchParams);
 
         if (value.length >= 3) {
@@ -55,20 +55,20 @@ export default function SearchBar({ className }: SearchBarProps) {
           params.delete('q');
         }
 
-        // Update URL with search query
+        // Axtarış sorğusu ilə URL-i yenilə
         const newUrl = pathname + (params.toString() ? `?${params.toString()}` : '');
         router.push(newUrl);
       }
     }
   };
 
-  // Handle search form submission
+  // Axtarış formunun göndərilməsini idarə et
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Only update URL if we're on blog pages
+    // Yalnız blog səhifələrində URL-i yenilə
     if (pathname === '/' || pathname === '/blog' || pathname.startsWith('/blog/')) {
-      // Create new URL with search query
+      // Axtarış sorğusu ilə yeni URL yarat
       const params = new URLSearchParams(searchParams);
 
       if (searchQuery) {
@@ -77,17 +77,17 @@ export default function SearchBar({ className }: SearchBarProps) {
         params.delete('q');
       }
 
-      // Update URL with search query
+      // Axtarış sorğusu ilə URL-i yenilə
       const newUrl = pathname + (params.toString() ? `?${params.toString()}` : '');
       router.push(newUrl);
     }
   };
 
-  // Toggle search input visibility
+  // Axtarış girişinin görünüşünü dəyiş
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
     if (!isSearchOpen) {
-      // Focus the input when opening
+      // Açıldıqda girişə fokuslan
       setTimeout(() => {
         const input = document.getElementById('search-input');
         if (input) input.focus();

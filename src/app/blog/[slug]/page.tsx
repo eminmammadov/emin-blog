@@ -1,4 +1,4 @@
-import { getBlogBySlug, getAllBlogs } from '@/lib/mdx';
+import { getBlogBySlug } from '@/lib/mdx';
 import Link from 'next/link';
 import styles from './blogPost.module.css';
 import { notFound } from 'next/navigation';
@@ -31,8 +31,11 @@ const BLOG_POST_TEXTS = {
   }
 };
 
-// Force dynamic rendering for this page
+// Force dynamic rendering for this page and disable static generation during build
 export const dynamic = 'force-dynamic';
+export const generateStaticParams = process.env.NODE_ENV === 'development'
+  ? undefined
+  : async () => { return []; };
 
 // Dynamic metadata generation for each blog post
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -91,12 +94,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export async function generateStaticParams() {
-  const blogs = await getAllBlogs();
-  return blogs.map((blog) => ({
-    slug: blog.slug,
-  }));
-}
+// The generateStaticParams function is now defined above
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   try {

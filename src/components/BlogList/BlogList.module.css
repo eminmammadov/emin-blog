@@ -29,7 +29,7 @@
 .dateHeader, .nameHeader, .typeHeader, .actionHeader {
   font-size: 0.75rem;
   font-weight: 500;
-  color: #666;
+  color: var(--gray);
   padding: 8px 0;
 }
 
@@ -135,7 +135,7 @@
 }
 
 .actionButton:hover {
-  color: #666;
+  color: var(--gray);
 }
 
 .blogLink {

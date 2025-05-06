@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-// Middleware için statik metinler
+// Middleware üçün statik mətnlər
 const MIDDLEWARE_TEXTS = {
   AUTH: {
     REALM: 'Admin Panel',
@@ -14,12 +14,12 @@ const MIDDLEWARE_TEXTS = {
   }
 };
 
-// Admin paneli ve API'ler için erişim bilgileri
-// Gerçek bir uygulamada bu değerler .env dosyasında saklanmalıdır
+// Admin paneli və API-lər üçün giriş məlumatları
+// Real bir tətbiqdə bu dəyərlər .env faylında saxlanmalıdır
 const ADMIN_USERNAME = MIDDLEWARE_TEXTS.CREDENTIALS.USERNAME;
 const ADMIN_PASSWORD = MIDDLEWARE_TEXTS.CREDENTIALS.PASSWORD;
 
-// Basic Auth için gerekli credential'ı oluştur
+// Basic Auth üçün lazım olan credential-ı yarat
 const BASIC_AUTH_CREDENTIAL = Buffer.from(`${ADMIN_USERNAME}:${ADMIN_PASSWORD}`).toString('base64');
 
 console.log('Expected credential:', BASIC_AUTH_CREDENTIAL);
@@ -29,15 +29,15 @@ export function middleware(request: NextRequest) {
 
   console.log(`Middleware processing path: ${pathname}`);
 
-  // Admin sayfaları için kimlik doğrulama
+  // Admin səhifələri üçün identifikasiya
   if (pathname === '/a/0x/admin' || pathname.startsWith('/a/0x/admin/')) {
     console.log(`Admin route detected: ${pathname}`);
 
-    // Authorization header'ını kontrol et
+    // Authorization header-ını yoxla
     const authHeader = request.headers.get('Authorization');
     console.log(`Auth header: ${authHeader || 'Missing'}`);
 
-    // Credential'ı çıkar ve kontrol et
+    // Credential-ı çıxar və yoxla
     let isAuthorized = false;
     if (authHeader?.startsWith('Basic ')) {
       const credential = authHeader.substring(6); // 'Basic ' sonrası
@@ -45,11 +45,11 @@ export function middleware(request: NextRequest) {
       isAuthorized = credential === BASIC_AUTH_CREDENTIAL;
     }
 
-    // Header yoksa veya geçersizse, kimlik doğrulama iste
+    // Header yoxdursa və ya etibarsızdırsa, identifikasiya tələb et
     if (!isAuthorized) {
       console.log('Authentication failed, requesting credentials');
 
-      // Kimlik doğrulama penceresi göster
+      // Identifikasiya pəncərəsi göstər
       return new NextResponse(null, {
         status: 401,
         headers: {
@@ -66,7 +66,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Korumalı API'ler için kimlik doğrulama
+  // Qorunan API-lər üçün identifikasiya
   if (pathname.startsWith('/api/blogs') &&
       (pathname.includes('/create') ||
        pathname.includes('/delete') ||
@@ -74,11 +74,11 @@ export function middleware(request: NextRequest) {
 
     console.log(`Protected API route detected: ${pathname}`);
 
-    // Authorization header'ını kontrol et
+    // Authorization header-ını yoxla
     const authHeader = request.headers.get('Authorization');
     console.log(`API Auth header: ${authHeader || 'Missing'}`);
 
-    // Credential'ı çıkar ve kontrol et
+    // Credential-ı çıxar və yoxla
     let isAuthorized = false;
     if (authHeader?.startsWith('Basic ')) {
       const credential = authHeader.substring(6); // 'Basic ' sonrası
@@ -86,7 +86,7 @@ export function middleware(request: NextRequest) {
       isAuthorized = credential === BASIC_AUTH_CREDENTIAL;
     }
 
-    // Header yoksa veya geçersizse, 401 hatası döndür
+    // Header yoxdursa və ya etibarsızdırsa, 401 xətası qaytar
     if (!isAuthorized) {
       console.log('API authentication failed');
 
@@ -110,7 +110,7 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Middleware'in çalışacağı path'ler
+// Middleware-in işləyəcəyi path-lər
 export const config = {
   matcher: [
     '/a/0x/admin/:path*',

@@ -14,7 +14,7 @@
   display: flex;
   justify-content: center;
   margin-bottom: 30px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--foreground);
 }
 
 .tabButton {
@@ -24,7 +24,7 @@
   font-size: 1rem;
   cursor: pointer;
   position: relative;
-  color: #666;
+  color: var(--gray);
 }
 
 .tabButton:hover {
@@ -88,16 +88,16 @@
 }
 
 .readOnlyInput {
-  background-color: #f8f8f8;
+  background-color: var(--footer);
   cursor: not-allowed;
-  color: #666;
+  color: var(--gray);
 }
 
 .helpText {
   display: block;
   margin-top: 5px;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--gray);
 }
 
 .slugContainer {
@@ -107,14 +107,14 @@
 
 .generateButton {
   padding: 0 15px;
-  background-color: #f0f0f0;
+  background-color: var(--footer);
   border: 1px solid var(--foreground);
   cursor: pointer;
   white-space: nowrap;
 }
 
 .generateButton:hover {
-  background-color: #e0e0e0;
+  background-color: var(--hover);
 }
 
 .submitButton {
@@ -122,7 +122,7 @@
   width: 100%;
   padding: 12px;
   background-color: var(--black);
-  color: white;
+  color: var(--light);
   border: none;
   font-size: 1rem;
   cursor: pointer;
@@ -177,11 +177,11 @@
 
 .blogTable th {
   font-weight: 500;
-  background-color: #f8f8f8;
+  background-color: var(--footer);
 }
 
 .blogTable tr:hover {
-  background-color: #f5f5f5;
+  background-color: var(--footer);
 }
 
 .actions {
@@ -201,7 +201,7 @@
 }
 
 .viewButton {
-  background-color: #f0f0f0;
+  background-color: var(--footer);
   color: var(--black);
   border: 1px solid var(--foreground);
 }
@@ -219,7 +219,7 @@
 }
 
 .viewButton:hover {
-  background-color: #e0e0e0;
+  background-color: var(--hover);
 }
 
 .editButton:hover {
@@ -233,14 +233,14 @@
 .loading {
   text-align: center;
   padding: 40px;
-  color: #666;
+  color: var(--gray);
 }
 
 .emptyState {
   text-align: center;
   padding: 40px;
-  color: #666;
-  background-color: #f8f8f8;
+  color: var(--gray);
+  background-color: var(--footer);
   border: 1px solid var(--foreground);
   border-radius: 4px;
 }
@@ -255,7 +255,7 @@
 .backLink {
   display: inline-block;
   padding: 8px 16px;
-  background-color: #f0f0f0;
+  background-color: var(--footer);
   color: var(--black);
   border: 1px solid var(--foreground);
   text-decoration: none;
@@ -263,7 +263,7 @@
 }
 
 .backLink:hover {
-  background-color: #e0e0e0;
+  background-color: var(--hover);
 }
 
 @media (max-width: 768px) {
