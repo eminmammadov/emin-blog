@@ -1,9 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
+// Middleware için statik metinler
+const MIDDLEWARE_TEXTS = {
+  AUTH: {
+    REALM: 'Admin Panel',
+    CHARSET: 'UTF-8',
+    ERROR: 'Unauthorized'
+  },
+  CREDENTIALS: {
+    USERNAME: 'eminx',
+    PASSWORD: '0xAdmin#321'
+  }
+};
 
 // Admin paneli ve API'ler için erişim bilgileri
 // Gerçek bir uygulamada bu değerler .env dosyasında saklanmalıdır
-const ADMIN_USERNAME = 'eminx';
-const ADMIN_PASSWORD = '0xAdmin#321';
+const ADMIN_USERNAME = MIDDLEWARE_TEXTS.CREDENTIALS.USERNAME;
+const ADMIN_PASSWORD = MIDDLEWARE_TEXTS.CREDENTIALS.PASSWORD;
 
 // Basic Auth için gerekli credential'ı oluştur
 const BASIC_AUTH_CREDENTIAL = Buffer.from(`${ADMIN_USERNAME}:${ADMIN_PASSWORD}`).toString('base64');
@@ -25,7 +39,7 @@ export function middleware(request: NextRequest) {
 
     // Credential'ı çıkar ve kontrol et
     let isAuthorized = false;
-    if (authHeader && authHeader.startsWith('Basic ')) {
+    if (authHeader?.startsWith('Basic ')) {
       const credential = authHeader.substring(6); // 'Basic ' sonrası
       console.log('Received credential:', credential);
       isAuthorized = credential === BASIC_AUTH_CREDENTIAL;
@@ -39,7 +53,7 @@ export function middleware(request: NextRequest) {
       return new NextResponse(null, {
         status: 401,
         headers: {
-          'WWW-Authenticate': 'Basic realm="Admin Panel", charset="UTF-8"',
+          'WWW-Authenticate': `Basic realm="${MIDDLEWARE_TEXTS.AUTH.REALM}", charset="${MIDDLEWARE_TEXTS.AUTH.CHARSET}"`,
           'Content-Type': 'text/html',
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
           'Pragma': 'no-cache',
@@ -66,7 +80,7 @@ export function middleware(request: NextRequest) {
 
     // Credential'ı çıkar ve kontrol et
     let isAuthorized = false;
-    if (authHeader && authHeader.startsWith('Basic ')) {
+    if (authHeader?.startsWith('Basic ')) {
       const credential = authHeader.substring(6); // 'Basic ' sonrası
       console.log('API received credential:', credential);
       isAuthorized = credential === BASIC_AUTH_CREDENTIAL;
@@ -77,7 +91,7 @@ export function middleware(request: NextRequest) {
       console.log('API authentication failed');
 
       return new NextResponse(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: MIDDLEWARE_TEXTS.AUTH.ERROR }),
         {
           status: 401,
           headers: {

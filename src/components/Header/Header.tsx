@@ -9,6 +9,26 @@ import NotificationSystem from '@/components/NotificationSystem';
 import DonateSystem from '@/components/DonateSystem';
 import SearchBar from '@/components/SearchBar';
 
+// Header bileşeni için statik metinler
+const HEADER_TEXTS = {
+  LOGO: {
+    ALT: 'Emin Blog Logo',
+    SRC: '/emin-blog-logo.svg'
+  },
+  NAVIGATION: {
+    ITEMS: [
+      { key: 'B', label: 'BLOQ', href: '/blog', isExternal: false },
+      { key: 'X', label: 'X', href: 'https://x.com/eminmammadov', isExternal: true },
+      { key: 'L', label: 'LINKEDIN', href: 'https://www.linkedin.com/in/eminmammadov', isExternal: true },
+      { key: 'G', label: 'GITHUB', href: 'https://github.com/eminmammadov', isExternal: true },
+    ]
+  },
+  MOBILE_MENU: {
+    ARIA_LABEL: 'Toggle mobile menu',
+    TITLE: 'Menu'
+  }
+};
+
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -35,17 +55,9 @@ export default function Header() {
     };
   }, [isMobileMenuOpen]);
 
-  // Define navigation items
-  const navItems = [
-    { key: 'B', label: 'BLOQ', href: '/blog', isExternal: false },
-    { key: 'X', label: 'X', href: 'https://x.com/eminmammadov', isExternal: true },
-    { key: 'L', label: 'LINKEDIN', href: 'https://www.linkedin.com/in/eminmammadov', isExternal: true },
-    { key: 'G', label: 'GITHUB', href: 'https://github.com/eminmammadov', isExternal: true },
-  ];
-
   // Function to render navigation items
   const renderNavItems = (isMobile = false) => {
-    return navItems.map((item) => {
+    return HEADER_TEXTS.NAVIGATION.ITEMS.map((item) => {
       // Determine if this item is active
       const isActive = !item.isExternal &&
         ((item.href === '/' && pathname === '/') ||
@@ -91,8 +103,8 @@ export default function Header() {
             <div className={styles.logoContainer} style={{ marginRight: '8px' }}>
               <Link href="/" className={styles.logoLink}>
                 <Image
-                  src="/emin-blog-logo.svg"
-                  alt="Emin Blog Logo"
+                  src={HEADER_TEXTS.LOGO.SRC}
+                  alt={HEADER_TEXTS.LOGO.ALT}
                   width={24}
                   height={24}
                   className={styles.logo}
@@ -122,7 +134,7 @@ export default function Header() {
               ref={mobileMenuButtonRef}
               className={`${styles.mobileMenuButton} ${isMobileMenuOpen ? styles.active : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle mobile menu"
+              aria-label={HEADER_TEXTS.MOBILE_MENU.ARIA_LABEL}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +144,7 @@ export default function Header() {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <title>Menu</title>
+                <title>{HEADER_TEXTS.MOBILE_MENU.TITLE}</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

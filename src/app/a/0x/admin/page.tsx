@@ -6,10 +6,65 @@ import Link from 'next/link';
 import type { BlogPost } from '@/types/blog';
 import dynamic from 'next/dynamic';
 
+// Admin sayfası için statik metinler
+const ADMIN_TEXTS = {
+  LOADING: {
+    EDITOR: 'Editör yüklənir...',
+    BLOGS: 'Yüklənir...'
+  },
+  TABS: {
+    CREATE: 'Yeni Bloq Yaz',
+    LIST: 'Bütün Bloqlar'
+  },
+  FORM: {
+    TITLE: 'Yeni Bloq Yazısı Yaz',
+    FIELDS: {
+      TITLE: 'Başlıq',
+      SLUG: 'Slug',
+      GENERATE_SLUG: 'Yarad',
+      DATE: 'Tarixçə (Avtomatik)',
+      DATE_HELP: 'Blog yazısı əlavə edilərkən avtomatik olaraq o anki tarix və saat istifadə ediləcəkdir.',
+      EXCERPT: 'Qısa Açıqlama',
+      CATEGORIES: 'Kateqoriya (vergüllə ayırın)',
+      AUTHOR: 'Yazan',
+      CONTENT: 'Content',
+      CONTENT_HELP: 'Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin və şəklin URL-ni daxil edin. Link əlavə etmək üçün mətni seçin və 🔗 düyməsini sıxın.',
+      CONTENT_PLACEHOLDER: 'Blog içeriğinizi buraya yazın...',
+      SUBMIT: 'Blog Yazısını Yayınla'
+    }
+  },
+  BLOG_LIST: {
+    TITLE: 'Bloq Yazıları',
+    EMPTY: 'Bloq yazısı tapılmadı.',
+    TABLE: {
+      TITLE: 'Başlıq',
+      DATE: 'Tarixçə',
+      CATEGORY: 'Kateqoriya',
+      ACTIONS: 'Əməliyyatlar'
+    },
+    ACTIONS: {
+      VIEW: 'Bloqa Bax',
+      EDIT: 'Düzəlt',
+      DELETE: 'Sil'
+    }
+  },
+  STATUS: {
+    SENDING: 'Gönderiliyor...',
+    SUCCESS_CREATE: 'Blog yazısı başarıyla oluşturuldu!',
+    SUCCESS_DELETE: 'Blog yazısı başarıyla silindi!',
+    ERROR_DEFAULT: 'Bir hata oluştu',
+    ERROR_FETCH: 'Bloq yazıları yüklənərkən bir xəta baş verdi',
+    ERROR_DELETE: 'Blog yazısı silinirken bir hata oluştu'
+  },
+  CONFIRM: {
+    DELETE: 'Bu bloq yazısını silmek istediğinizden emin misiniz?'
+  }
+};
+
 // Dinamik olarak import ediyoruz çünkü bu bileşen sadece client tarafında çalışabilir
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
   ssr: false,
-  loading: () => <div className={styles.loading}>Editör yüklənir...</div>
+  loading: () => <div className={styles.loading}>{ADMIN_TEXTS.LOADING.EDITOR}</div>
 });
 
 export default function AdminPage() {
@@ -64,7 +119,7 @@ export default function AdminPage() {
         setLoading(true);
         const response = await fetch('/api/blogs');
         if (!response.ok) {
-          throw new Error('Bloq yazıları yüklənərkən bir xəta baş verdi');
+          throw new Error(ADMIN_TEXTS.STATUS.ERROR_FETCH);
         }
         const data = await response.json();
         setBlogs(data);
@@ -107,7 +162,7 @@ export default function AdminPage() {
       setLoading(true);
       const response = await fetch('/api/blogs');
       if (!response.ok) {
-        throw new Error('Bloq yazıları yüklənərkən bir xəta baş verdi');
+        throw new Error(ADMIN_TEXTS.STATUS.ERROR_FETCH);
       }
       const data = await response.json();
       setBlogs(data);
@@ -120,7 +175,7 @@ export default function AdminPage() {
 
   // Function to delete a bloq
   const deleteBlog = async (slug: string) => {
-    if (!confirm('Bu bloq yazısını silmek istediğinizden emin misiniz?')) {
+    if (!confirm(ADMIN_TEXTS.CONFIRM.DELETE)) {
       return;
     }
 
@@ -135,15 +190,15 @@ export default function AdminPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Blog yazısı silinirken bir hata oluştu');
+        throw new Error(data.error || ADMIN_TEXTS.STATUS.ERROR_DELETE);
       }
 
-      setStatus({ message: 'Blog yazısı başarıyla silindi!', type: 'success' });
+      setStatus({ message: ADMIN_TEXTS.STATUS.SUCCESS_DELETE, type: 'success' });
       fetchBlogs();
     } catch (error) {
       console.error('Error deleting bloq:', error);
       setStatus({
-        message: error instanceof Error ? error.message : 'Bir hata oluştu',
+        message: error instanceof Error ? error.message : ADMIN_TEXTS.STATUS.ERROR_DEFAULT,
         type: 'error'
       });
     } finally {
@@ -156,7 +211,7 @@ export default function AdminPage() {
     e.preventDefault();
 
     try {
-      setStatus({ message: 'Gönderiliyor...', type: 'info' });
+      setStatus({ message: ADMIN_TEXTS.STATUS.SENDING, type: 'info' });
 
       // Convert categories string to array
       const categoriesArray = formData.categories
@@ -179,10 +234,10 @@ export default function AdminPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Bir hata oluştu');
+        throw new Error(data.error || ADMIN_TEXTS.STATUS.ERROR_DEFAULT);
       }
 
-      setStatus({ message: 'Blog yazısı başarıyla oluşturuldu!', type: 'success' });
+      setStatus({ message: ADMIN_TEXTS.STATUS.SUCCESS_CREATE, type: 'success' });
 
       // Reset form after successful submission
       setFormData({
@@ -202,7 +257,7 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error creating bloq:', error);
       setStatus({
-        message: error instanceof Error ? error.message : 'Bir hata oluştu',
+        message: error instanceof Error ? error.message : ADMIN_TEXTS.STATUS.ERROR_DEFAULT,
         type: 'error'
       });
     }
@@ -216,14 +271,14 @@ export default function AdminPage() {
           className={`${styles.tabButton} ${activeTab === 'create' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('create')}
         >
-          Yeni Bloq Yaz
+          {ADMIN_TEXTS.TABS.CREATE}
         </button>
         <button
           type="button"
           className={`${styles.tabButton} ${activeTab === 'list' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('list')}
         >
-          Bütün Bloqlar
+          {ADMIN_TEXTS.TABS.LIST}
         </button>
       </div>
 
@@ -235,10 +290,10 @@ export default function AdminPage() {
 
       {activeTab === 'create' ? (
         <>
-          <h1 className={styles.adminTitle}>Yeni Bloq Yazısı Yaz</h1>
+          <h1 className={styles.adminTitle}>{ADMIN_TEXTS.FORM.TITLE}</h1>
           <form onSubmit={handleSubmit} className={styles.blogForm}>
         <div className={styles.formGroup}>
-          <label htmlFor="title">Başlıq</label>
+          <label htmlFor="title">{ADMIN_TEXTS.FORM.FIELDS.TITLE}</label>
           <input
             type="text"
             id="title"
@@ -251,7 +306,7 @@ export default function AdminPage() {
 
         <div className={styles.formRow}>
           <div className={styles.formGroup}>
-            <label htmlFor="slug">Slug</label>
+            <label htmlFor="slug">{ADMIN_TEXTS.FORM.FIELDS.SLUG}</label>
             <div className={styles.slugContainer}>
               <input
                 type="text"
@@ -266,13 +321,13 @@ export default function AdminPage() {
                 onClick={generateSlug}
                 className={styles.generateButton}
               >
-                Yarad
+                {ADMIN_TEXTS.FORM.FIELDS.GENERATE_SLUG}
               </button>
             </div>
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="date">Tarixçə (Avtomatik)</label>
+            <label htmlFor="date">{ADMIN_TEXTS.FORM.FIELDS.DATE}</label>
             <input
               type="text"
               id="date"
@@ -283,13 +338,13 @@ export default function AdminPage() {
               className={styles.readOnlyInput}
             />
             <small className={styles.helpText}>
-              Blog yazısı əlavə edilərkən avtomatik olaraq o anki tarix və saat istifadə ediləcəkdir.
+              {ADMIN_TEXTS.FORM.FIELDS.DATE_HELP}
             </small>
           </div>
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="excerpt">Qısa Açıqlama</label>
+          <label htmlFor="excerpt">{ADMIN_TEXTS.FORM.FIELDS.EXCERPT}</label>
           <textarea
             id="excerpt"
             name="excerpt"
@@ -302,7 +357,7 @@ export default function AdminPage() {
 
         <div className={styles.formRow}>
           <div className={styles.formGroup}>
-            <label htmlFor="categories">Kateqoriya (vergüllə ayırın)</label>
+            <label htmlFor="categories">{ADMIN_TEXTS.FORM.FIELDS.CATEGORIES}</label>
             <input
               type="text"
               id="categories"
@@ -314,7 +369,7 @@ export default function AdminPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="author">Yazan</label>
+            <label htmlFor="author">{ADMIN_TEXTS.FORM.FIELDS.AUTHOR}</label>
             <input
               type="text"
               id="author"
@@ -326,41 +381,41 @@ export default function AdminPage() {
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="content">Content</label>
+          <label htmlFor="content">{ADMIN_TEXTS.FORM.FIELDS.CONTENT}</label>
           <RichTextEditor
             value={formData.content}
             onChange={handleEditorChange}
-            placeholder="Blog içeriğinizi buraya yazın..."
+            placeholder={ADMIN_TEXTS.FORM.FIELDS.CONTENT_PLACEHOLDER}
           />
           <small className={styles.helpText}>
-            Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin və şəklin URL-ni daxil edin. Link əlavə etmək üçün mətni seçin və 🔗 düyməsini sıxın.
+            {ADMIN_TEXTS.FORM.FIELDS.CONTENT_HELP}
           </small>
         </div>
 
         <button type="submit" className={styles.submitButton}>
-          Blog Yazısını Yayınla
+          {ADMIN_TEXTS.FORM.FIELDS.SUBMIT}
         </button>
       </form>
       </>
       ) : (
         <>
-          <h1 className={styles.adminTitle}>Bloq Yazıları</h1>
+          <h1 className={styles.adminTitle}>{ADMIN_TEXTS.BLOG_LIST.TITLE}</h1>
 
           {loading ? (
-            <div className={styles.loading}>Yüklənir...</div>
+            <div className={styles.loading}>{ADMIN_TEXTS.LOADING.BLOGS}</div>
           ) : blogs.length === 0 ? (
             <div className={styles.emptyState}>
-              Bloq yazısı tapılmadı.
+              {ADMIN_TEXTS.BLOG_LIST.EMPTY}
             </div>
           ) : (
             <div className={styles.blogList}>
               <table className={styles.blogTable}>
                 <thead>
                   <tr>
-                    <th>Başlıq</th>
-                    <th>Tarixçə</th>
-                    <th>Kateqoriya</th>
-                    <th>Əməliyyatlar</th>
+                    <th>{ADMIN_TEXTS.BLOG_LIST.TABLE.TITLE}</th>
+                    <th>{ADMIN_TEXTS.BLOG_LIST.TABLE.DATE}</th>
+                    <th>{ADMIN_TEXTS.BLOG_LIST.TABLE.CATEGORY}</th>
+                    <th>{ADMIN_TEXTS.BLOG_LIST.TABLE.ACTIONS}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -371,17 +426,17 @@ export default function AdminPage() {
                       <td>{blog.category}</td>
                       <td className={styles.actions}>
                         <Link href={`/blog/${blog.slug}`} target="_blank" className={styles.viewButton}>
-                          Bloqa Bax
+                          {ADMIN_TEXTS.BLOG_LIST.ACTIONS.VIEW}
                         </Link>
                         <Link href={`/a/0x/admin/edit/${blog.slug}`} className={styles.editButton}>
-                          Düzəlt
+                          {ADMIN_TEXTS.BLOG_LIST.ACTIONS.EDIT}
                         </Link>
                         <button
                           type="button"
                           onClick={() => deleteBlog(blog.slug)}
                           className={styles.deleteButton}
                         >
-                          Sil
+                          {ADMIN_TEXTS.BLOG_LIST.ACTIONS.DELETE}
                         </button>
                       </td>
                     </tr>

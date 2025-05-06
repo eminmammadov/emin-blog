@@ -7,6 +7,30 @@ import type { Metadata } from 'next';
 import { getFullUrl } from '@/lib/utils';
 import ShareButtons from '@/components/ShareButtons/ShareButtons';
 
+// Blog post sayfası için statik metinler
+const BLOG_POST_TEXTS = {
+  META: {
+    NOT_FOUND_TITLE: 'Blog Yazıları Tapılmadı',
+    NOT_FOUND_DESCRIPTION: 'Axtardığınız bloq yazısı tapılmadı.',
+    DEFAULT_TITLE: 'Blog',
+    DEFAULT_DESCRIPTION: 'Emin Blog'
+  },
+  SECTIONS: {
+    METADATA: '/ METADATA',
+    ARTICLE: '/ MƏQALƏ'
+  },
+  LABELS: {
+    DATE: 'TARİXÇƏ:',
+    CATEGORY: 'KATEQORİYA:',
+    SHARE: 'PAYLAŞ:'
+  },
+  BACK_BUTTON: '← Geriyə get',
+  ERROR: {
+    TITLE: 'Blog yazısı yüklenirken bir hata oluştu',
+    MESSAGE: 'Lütfen daha sonra tekrar deneyin.'
+  }
+};
+
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic';
 
@@ -23,8 +47,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     if (!post) {
       console.log(`Blog post with slug ${slug} not found for metadata`);
       return {
-        title: 'Blog Yazıları Tapılmadı',
-        description: 'Axtardığınız bloq yazısı tapılmadı.',
+        title: BLOG_POST_TEXTS.META.NOT_FOUND_TITLE,
+        description: BLOG_POST_TEXTS.META.NOT_FOUND_DESCRIPTION,
       };
     }
 
@@ -61,8 +85,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   } catch (error) {
     console.error("Error generating metadata for blog post:", error);
     return {
-      title: 'Blog',
-      description: 'Emin Blog',
+      title: BLOG_POST_TEXTS.META.DEFAULT_TITLE,
+      description: BLOG_POST_TEXTS.META.DEFAULT_DESCRIPTION,
     };
   }
 }
@@ -95,18 +119,18 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           <h1 className={styles.blogPostTitle}>{post.title}</h1>
 
           <div className={styles.metadataSection}>
-            <h2 className={styles.sectionTitle}>/ METADATA</h2>
+            <h2 className={styles.sectionTitle}>{BLOG_POST_TEXTS.SECTIONS.METADATA}</h2>
             <div className={styles.metadataGrid}>
               <div className={styles.metadataItem}>
-                <div className={styles.metadataLabel}>TARİXÇƏ:</div>
+                <div className={styles.metadataLabel}>{BLOG_POST_TEXTS.LABELS.DATE}</div>
                 <div className={styles.metadataValue}>{post.date}</div>
               </div>
               <div className={styles.metadataItem}>
-                <div className={styles.metadataLabel}>KATEQORİYA:</div>
+                <div className={styles.metadataLabel}>{BLOG_POST_TEXTS.LABELS.CATEGORY}</div>
                 <div className={styles.metadataValue}>{post.category}</div>
               </div>
               <div className={styles.metadataItem}>
-                <div className={styles.metadataLabel}>PAYLAŞ:</div>
+                <div className={styles.metadataLabel}>{BLOG_POST_TEXTS.LABELS.SHARE}</div>
                 <ShareButtons
                   title={post.title}
                   slug={post.slug}
@@ -116,12 +140,12 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </div>
 
           <div className={styles.articleSection}>
-            <h2 className={styles.sectionTitle}>/ MƏQALƏ</h2>
+            <h2 className={styles.sectionTitle}>{BLOG_POST_TEXTS.SECTIONS.ARTICLE}</h2>
             <div className={styles.articleContent}>
               <MDXRemote source={post.content} />
               <div>
                 <Link href="/blog" className={styles.backButton}>
-                  ← Geriyə get
+                  {BLOG_POST_TEXTS.BACK_BUTTON}
                 </Link>
               </div>
             </div>
@@ -134,13 +158,13 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     return (
       <article className={styles.blogPostContainer}>
         <div className={styles.blogPostContent}>
-          <h1 className={styles.blogPostTitle}>Blog yazısı yüklenirken bir hata oluştu</h1>
+          <h1 className={styles.blogPostTitle}>{BLOG_POST_TEXTS.ERROR.TITLE}</h1>
           <div className={styles.articleSection}>
             <div className={styles.articleContent}>
-              <p>Lütfen daha sonra tekrar deneyin.</p>
+              <p>{BLOG_POST_TEXTS.ERROR.MESSAGE}</p>
               <div>
                 <Link href="/blog" className={styles.backButton}>
-                  ← Geriyə get
+                  {BLOG_POST_TEXTS.BACK_BUTTON}
                 </Link>
               </div>
             </div>

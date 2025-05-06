@@ -4,6 +4,19 @@ import { useState, useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import styles from './SearchBar.module.css';
 
+// SearchBar bileşeni için statik metinler
+const SEARCH_BAR_TEXTS = {
+  PLACEHOLDER: 'Axtar',
+  ARIA_LABELS: {
+    SEARCH: 'Axtarış',
+    CLOSE: 'Bağla'
+  },
+  BUTTON_TITLES: {
+    SEARCH: 'Axtarış',
+    CLOSE: 'Bağla'
+  }
+};
+
 interface SearchBarProps {
   className?: string;
 }
@@ -90,10 +103,10 @@ export default function SearchBar({ className }: SearchBarProps) {
             id="search-input"
             type="text"
             className={styles.searchInput}
-            placeholder="Axtar"
+            placeholder={SEARCH_BAR_TEXTS.PLACEHOLDER}
             value={searchQuery}
             onChange={handleSearchChange}
-            aria-label="Axtarış"
+            aria-label={SEARCH_BAR_TEXTS.ARIA_LABELS.SEARCH}
           />
         </div>
       </form>
@@ -102,7 +115,7 @@ export default function SearchBar({ className }: SearchBarProps) {
         type="button"
         className={`${styles.searchButton} ${isSearchOpen ? styles.active : ''}`}
         onClick={toggleSearch}
-        aria-label={isSearchOpen ? "Bağla" : "Axtarış"}
+        aria-label={isSearchOpen ? SEARCH_BAR_TEXTS.ARIA_LABELS.CLOSE : SEARCH_BAR_TEXTS.ARIA_LABELS.SEARCH}
       >
         {isSearchOpen ? (
           <svg
@@ -113,7 +126,7 @@ export default function SearchBar({ className }: SearchBarProps) {
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <title>Bağla</title>
+            <title>{SEARCH_BAR_TEXTS.BUTTON_TITLES.CLOSE}</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -130,7 +143,7 @@ export default function SearchBar({ className }: SearchBarProps) {
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <title>Axtarış</title>
+            <title>{SEARCH_BAR_TEXTS.BUTTON_TITLES.SEARCH}</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

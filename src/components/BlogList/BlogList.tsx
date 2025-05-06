@@ -6,6 +6,21 @@ import { useSearchParams } from 'next/navigation';
 import styles from './BlogList.module.css';
 import type { BlogPost } from '@/types/blog';
 
+// BlogList bileşeni için statik metinler
+const BLOG_LIST_TEXTS = {
+  TABLE_HEADERS: {
+    DATE: '/ TARİXÇƏ',
+    ARTICLES: '/ MƏQALƏLƏR',
+    CATEGORY: '/ KATEQORİYA'
+  },
+  SEARCH: {
+    NO_RESULTS: 'üçün heç bir nəticə tapılmadı.',
+    RESULTS_FOUND: 'üçün {count} nəticə tapıldı.',
+    NO_MATCHING_POSTS: 'Axtarışınıza uyğun bloq yazısı tapılmadı.',
+    NO_POSTS: 'Bloq yazısı tapılmadı.'
+  }
+};
+
 interface BlogListProps {
   posts: BlogPost[];
   limit?: number;
@@ -68,24 +83,24 @@ export default function BlogList({
       {isSearching && (
         <div style={{ marginBottom: '20px', fontSize: '0.9rem' }}>
           {filteredPosts.length === 0 ? (
-            <p><strong>&quot;{searchQuery}&quot;</strong> üçün heç bir nəticə tapılmadı.</p>
+            <p><strong>&quot;{searchQuery}&quot;</strong> {BLOG_LIST_TEXTS.SEARCH.NO_RESULTS}</p>
           ) : (
-            <p><strong>&quot;{searchQuery}&quot;</strong> üçün {filteredPosts.length} nəticə tapıldı.</p>
+            <p><strong>&quot;{searchQuery}&quot;</strong> {BLOG_LIST_TEXTS.SEARCH.RESULTS_FOUND.replace('{count}', filteredPosts.length.toString())}</p>
           )}
         </div>
       )}
 
       {filteredPosts.length === 0 ? (
         <div style={{ padding: '20px 0', textAlign: 'center' }}>
-          {isSearching ? 'Axtarışınıza uyğun bloq yazısı tapılmadı.' : 'Bloq yazısı tapılmadı.'}
+          {isSearching ? BLOG_LIST_TEXTS.SEARCH.NO_MATCHING_POSTS : BLOG_LIST_TEXTS.SEARCH.NO_POSTS}
         </div>
       ) : (
         <table className={styles.blogTable}>
           <thead>
             <tr className={styles.tableHeader}>
-              <th className={styles.dateHeader}>/ TARİXÇƏ</th>
-              <th className={styles.nameHeader}>/ MƏQALƏLƏR</th>
-              <th className={styles.typeHeader}>/ KATEQORİYA</th>
+              <th className={styles.dateHeader}>{BLOG_LIST_TEXTS.TABLE_HEADERS.DATE}</th>
+              <th className={styles.nameHeader}>{BLOG_LIST_TEXTS.TABLE_HEADERS.ARTICLES}</th>
+              <th className={styles.typeHeader}>{BLOG_LIST_TEXTS.TABLE_HEADERS.CATEGORY}</th>
               <th className={styles.actionHeader} />
             </tr>
           </thead>

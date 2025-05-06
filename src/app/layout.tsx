@@ -6,6 +6,19 @@ import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
 import { Suspense } from "react";
 
+// Layout için statik metinler
+const LAYOUT_TEXTS = {
+  LOADING: 'Yüklənir...',
+  META: {
+    TITLE: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
+    DESCRIPTION: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji bloq yazıları',
+    CREATOR: '@eminmammadov',
+    PUBLISHER: 'Emin Blog',
+    SITE_NAME: 'Emin Blog',
+    ALT: 'Emin Blog'
+  }
+};
+
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
@@ -23,13 +36,13 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: {
     template: '%s | Emin Blog',
-    default: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
+    default: LAYOUT_TEXTS.META.TITLE,
   },
-  description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji bloq yazıları',
+  description: LAYOUT_TEXTS.META.DESCRIPTION,
   keywords: ['blockchain', 'sistem memarlığı', 'texnologiya', 'bloq', 'Emin'],
   authors: [{ name: 'Emin', url: 'https://x.com/eminmammadov' }],
   creator: 'Emin',
-  publisher: 'Emin Blog',
+  publisher: LAYOUT_TEXTS.META.PUBLISHER,
   formatDetection: {
     email: false,
     address: false,
@@ -68,10 +81,10 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
-    description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji bloq yazıları',
+    title: LAYOUT_TEXTS.META.TITLE,
+    description: LAYOUT_TEXTS.META.DESCRIPTION,
     url: 'https://example.com',
-    siteName: 'Emin Blog',
+    siteName: LAYOUT_TEXTS.META.SITE_NAME,
     locale: 'az_AZ',
     type: 'website',
     images: [
@@ -79,15 +92,15 @@ export const metadata: Metadata = {
         url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Emin Blog',
+        alt: LAYOUT_TEXTS.META.ALT,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Emin Blog - Blockchain ve Sistem Memarlığı Hakkında',
-    description: 'Az bilinən blockchain və sistem memarlığı haqqında texnoloji bloq yazıları',
-    creator: '@eminmammadov',
+    title: LAYOUT_TEXTS.META.TITLE,
+    description: LAYOUT_TEXTS.META.DESCRIPTION,
+    creator: LAYOUT_TEXTS.META.CREATOR,
     images: ['/images/og-image.jpg'],
   },
   robots: {
@@ -115,7 +128,7 @@ export default function RootLayout({
         data-new-gr-c-s-check-loaded="14.1233.0"
         data-gr-ext-installed=""
       >
-        <Suspense fallback={<div className="h-screen bg-[#F7F7F3] flex items-center justify-center">Yüklənir...</div>}>
+        <Suspense fallback={<div className="h-screen bg-[#F7F7F3] flex items-center justify-center">{LAYOUT_TEXTS.LOADING}</div>}>
           <LoadingScreen />
         </Suspense>
         <Suspense fallback={<div className="h-16 bg-[#F7F7F3]"/>}>

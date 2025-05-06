@@ -6,6 +6,27 @@ import Link from 'next/link';
 import { Check, CheckCheck } from 'lucide-react';
 import styles from './NotificationSystem.module.css';
 
+// NotificationSystem bileşeni için statik metinler
+const NOTIFICATION_TEXTS = {
+  BUTTON: {
+    ARIA_LABEL: 'Bildirimlər',
+    TITLE: 'Bildirimlər'
+  },
+  DROPDOWN: {
+    HEADER: 'Bildirimlər',
+    NO_NOTIFICATIONS: 'Bloq yazısı yoxdur',
+    NEW_LABEL: 'Yeni: ',
+    MARK_ALL_READ: 'Oxundu işarələ',
+    MARKED_READ: 'Oxundu',
+    VIEW_ALL: 'Bütün blog yazılarını göstər'
+  },
+  DATE_FORMAT: {
+    LAST_POST: 'Son paylaşım',
+    MINUTES_AGO: '{minutes} dakika önce',
+    HOURS_AGO: '{hours} saat önce'
+  }
+};
+
 // Define blog post type
 export type BlogPostType = {
   _id?: string;
@@ -49,7 +70,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
       // Eğer tarih string değilse veya boşsa, son paylaşım tarihi olarak göster
       if (!dateString || typeof dateString !== 'string') {
         console.log('Invalid date string:', dateString);
-        return 'Son paylaşım';
+        return NOTIFICATION_TEXTS.DATE_FORMAT.LAST_POST;
       }
 
       // Eğer tarih zaten "YYYY.MM.DD - HH:MM AM/PM" formatındaysa, doğrudan kullan
@@ -68,7 +89,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
         // Geçerli bir tarih değilse veya NaN ise, son paylaşım tarihi olarak göster
         if (Number.isNaN(date.getTime())) {
           console.log('Invalid ISO date (NaN)');
-          return 'Son paylaşım';
+          return NOTIFICATION_TEXTS.DATE_FORMAT.LAST_POST;
         }
 
         const now = new Date();
@@ -80,11 +101,11 @@ export default function NotificationSystem({ className }: NotificationSystemProp
         if (diffHours < 24) {
           if (diffHours === 0) {
             const diffMinutes = Math.floor(diffTime / (1000 * 60));
-            const result = `${diffMinutes} dakika önce`;
+            const result = NOTIFICATION_TEXTS.DATE_FORMAT.MINUTES_AGO.replace('{minutes}', diffMinutes.toString());
             console.log('Formatted as minutes ago:', result);
             return result;
           }
-          const result = `${diffHours} saat önce`;
+          const result = NOTIFICATION_TEXTS.DATE_FORMAT.HOURS_AGO.replace('{hours}', diffHours.toString());
           console.log('Formatted as hours ago:', result);
           return result;
         }
@@ -110,7 +131,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
       return dateString;
     } catch (error) {
       console.error('Date formatting error:', error);
-      return 'Son paylaşım';
+      return NOTIFICATION_TEXTS.DATE_FORMAT.LAST_POST;
     }
   }, []);
 
@@ -311,7 +332,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
               try {
                 // Eski format (string[]) veya yeni format (Record<string, number>) olabilir
                 const parsed = JSON.parse(readNotificationsJSON);
-                
+
                 if (Array.isArray(parsed)) {
                   // Eski format: string[] -> Record<string, number> dönüşümü
                   console.log('Converting old readNotifications format to new format');
@@ -324,7 +345,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
                   // Yeni format: Record<string, number>
                   readNotifications = parsed;
                 }
-                
+
                 console.log('Read notifications loaded from localStorage:', readNotifications);
               } catch (error) {
                 console.error('Error parsing read notifications from localStorage:', error);
@@ -336,7 +357,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
               const postId = post._id || post.slug;
               // Daha önce okunmuş mu kontrol et
               const isRead = postId in readNotifications;
-              
+
               // Okunma zamanını al
               let readAt: number | undefined = undefined;
               if (isRead) {
@@ -378,11 +399,11 @@ export default function NotificationSystem({ className }: NotificationSystemProp
             setNotifications(filteredNotifications);
             setHasUnreadNotifications(hasUnread);
             localStorage.setItem('notifications', JSON.stringify(filteredNotifications));
-            
+
             // Tüm bildirimlerin okunma durumunu kontrol et
-            const allRead = filteredNotifications.every(notification => notification.read);
+            const allRead = filteredNotifications.every((notification: NotificationType) => notification.read);
             setAreAllNotificationsRead(allRead);
-            
+
             return;
           }
 
@@ -446,7 +467,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
           // Okunmamış bildirim var mı kontrol et
           const hasUnread = filteredNotifications.some(notification => !notification.read);
           setHasUnreadNotifications(hasUnread);
-          
+
           // Tüm bildirimlerin okunma durumunu kontrol et
           const allRead = filteredNotifications.every(notification => notification.read);
           setAreAllNotificationsRead(allRead);
@@ -501,7 +522,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
       try {
         // Eski format (string[]) veya yeni format (Record<string, number>) olabilir
         const parsed = JSON.parse(readNotificationsJSON);
-        
+
         if (Array.isArray(parsed)) {
           // Eski format: string[] -> Record<string, number> dönüşümü
           console.log('Converting old readNotifications format to new format');
@@ -544,7 +565,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
     // Check if there are any unread notifications left
     const unreadExists = updatedNotifications.some(notification => !notification.read);
     setHasUnreadNotifications(unreadExists);
-    
+
     // Tüm bildirimlerin okunma durumunu kontrol et
     const allRead = updatedNotifications.every(notification => notification.read);
     setAreAllNotificationsRead(allRead);
@@ -560,7 +581,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
       try {
         // Eski format (string[]) veya yeni format (Record<string, number>) olabilir
         const parsed = JSON.parse(readNotificationsJSON);
-        
+
         if (Array.isArray(parsed)) {
           // Eski format: string[] -> Record<string, number> dönüşümü
           console.log('Converting old readNotifications format to new format');
@@ -600,7 +621,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
         type="button"
         className={`${styles.notificationButton} ${isNotificationOpen ? styles.notificationButtonActive : ''}`}
         onClick={toggleNotification}
-        aria-label="Bildirimlər"
+        aria-label={NOTIFICATION_TEXTS.BUTTON.ARIA_LABEL}
       >
         {hasUnreadNotifications && <span className={styles.notificationDot} />}
         <svg
@@ -611,7 +632,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <title>Bildirimlər</title>
+          <title>{NOTIFICATION_TEXTS.BUTTON.TITLE}</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -624,7 +645,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
       {/* Notification Dropdown */}
       <div className={`${styles.notificationDropdown} ${isNotificationOpen ? styles.notificationDropdownOpen : ''}`}>
         <div className={styles.notificationHeader}>
-          <h3 className={styles.notificationTitle}>Bildirimlər</h3>
+          <h3 className={styles.notificationTitle}>{NOTIFICATION_TEXTS.DROPDOWN.HEADER}</h3>
           <button
             type="button"
             className={styles.markAsReadButton}
@@ -635,14 +656,14 @@ export default function NotificationSystem({ className }: NotificationSystemProp
             ) : (
               <Check size={16} style={{ marginRight: '4px' }} />
             )}
-            {areAllNotificationsRead ? 'Oxundu' : 'Oxundu işarələ'}
+            {areAllNotificationsRead ? NOTIFICATION_TEXTS.DROPDOWN.MARKED_READ : NOTIFICATION_TEXTS.DROPDOWN.MARK_ALL_READ}
           </button>
         </div>
 
         <div className={styles.notificationList}>
           {notifications.length === 0 ? (
             <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
-              Bloq yazısı yoxdur
+              {NOTIFICATION_TEXTS.DROPDOWN.NO_NOTIFICATIONS}
             </div>
           ) : (
             notifications.map((notification) => (
@@ -657,11 +678,11 @@ export default function NotificationSystem({ className }: NotificationSystemProp
                 <div className={styles.notificationContent}>
                   <p className={styles.notificationText}>
                     <span style={{ fontWeight: 'normal' }}
-                    className={styles.newTxt}>Yeni: </span>
+                    className={styles.newTxt}>{NOTIFICATION_TEXTS.DROPDOWN.NEW_LABEL}</span>
                     {notification.message}
                   </p>
                   <p className={styles.notificationDate}>
-                    {notification.date || 'Son paylaşım'}
+                    {notification.date || NOTIFICATION_TEXTS.DATE_FORMAT.LAST_POST}
                   </p>
                 </div>
 
@@ -671,7 +692,7 @@ export default function NotificationSystem({ className }: NotificationSystemProp
         </div>
 
         <Link href="/blog" className={styles.viewAllLink} onClick={() => setIsNotificationOpen(false)}>
-          Bütün blog yazılarını göstər
+          {NOTIFICATION_TEXTS.DROPDOWN.VIEW_ALL}
         </Link>
       </div>
     </div>

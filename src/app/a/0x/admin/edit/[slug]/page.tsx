@@ -6,10 +6,40 @@ import Link from 'next/link';
 import styles from '../../admin.module.css';
 import dynamic from 'next/dynamic';
 
+// Edit sayfası için statik metinler
+const EDIT_TEXTS = {
+  LOADING: {
+    EDITOR: 'Editör yükleniyor...',
+    BLOG: 'Yükleniyor...'
+  },
+  TITLE: {
+    PAGE: 'Blog Yazısını Düzenle',
+    BACK: '← Admin Panelinə Get'
+  },
+  FORM: {
+    FIELDS: {
+      TITLE: 'Başlıq',
+      EXCERPT: 'Qısa Açıqlama',
+      CATEGORIES: 'Kategoriya (vergüllə ayırın)',
+      AUTHOR: 'Yazan',
+      CONTENT: 'Content',
+      CONTENT_HELP: 'Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin və şəklin URL-ni daxil edin. Link əlavə etmək üçün mətni seçin və 🔗 düyməsini sıxın.',
+      CONTENT_PLACEHOLDER: 'Blog içeriğinizi buraya yazın...',
+      SUBMIT: 'Bloq Yazısını Yeniləyin'
+    }
+  },
+  STATUS: {
+    UPDATING: 'Güncelleniyor...',
+    SUCCESS: 'Blog yazısı başarıyla güncellendi!',
+    ERROR_DEFAULT: 'Bir hata oluştu',
+    ERROR_FETCH: 'Blog yazısı yüklenirken bir hata oluştu'
+  }
+};
+
 // Dinamik olarak import ediyoruz çünkü bu bileşen sadece client tarafında çalışabilir
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
   ssr: false,
-  loading: () => <div className={styles.loading}>Editör yükleniyor...</div>
+  loading: () => <div className={styles.loading}>{EDIT_TEXTS.LOADING.EDITOR}</div>
 });
 
 export default function EditBlogPage({ params }: { params: { slug: string } }) {
@@ -45,7 +75,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
         });
 
         if (!response.ok) {
-          throw new Error('Blog yazısı yüklenirken bir hata oluştu');
+          throw new Error(EDIT_TEXTS.STATUS.ERROR_FETCH);
         }
 
         const blog = await response.json();
@@ -60,7 +90,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
       } catch (error) {
         console.error('Error fetching blog:', error);
         setStatus({
-          message: error instanceof Error ? error.message : 'Bir hata oluştu',
+          message: error instanceof Error ? error.message : EDIT_TEXTS.STATUS.ERROR_DEFAULT,
           type: 'error'
         });
       } finally {
@@ -85,7 +115,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
     e.preventDefault();
 
     try {
-      setStatus({ message: 'Güncelleniyor...', type: 'info' });
+      setStatus({ message: EDIT_TEXTS.STATUS.UPDATING, type: 'info' });
 
       // Convert categories string to array
       const categoriesArray = formData.categories
@@ -108,10 +138,10 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Bir hata oluştu');
+        throw new Error(data.error || EDIT_TEXTS.STATUS.ERROR_DEFAULT);
       }
 
-      setStatus({ message: 'Blog yazısı başarıyla güncellendi!', type: 'success' });
+      setStatus({ message: EDIT_TEXTS.STATUS.SUCCESS, type: 'success' });
 
       // Redirect to admin page after 2 seconds
       setTimeout(() => {
@@ -120,7 +150,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
     } catch (error) {
       console.error('Error updating blog:', error);
       setStatus({
-        message: error instanceof Error ? error.message : 'Bir hata oluştu',
+        message: error instanceof Error ? error.message : EDIT_TEXTS.STATUS.ERROR_DEFAULT,
         type: 'error'
       });
     }
@@ -129,8 +159,8 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
   if (loading) {
     return (
       <div className={styles.adminContainer}>
-        <h1 className={styles.adminTitle}>Blog Yazısını Düzenle</h1>
-        <div className={styles.loading}>Yükleniyor...</div>
+        <h1 className={styles.adminTitle}>{EDIT_TEXTS.TITLE.PAGE}</h1>
+        <div className={styles.loading}>{EDIT_TEXTS.LOADING.BLOG}</div>
       </div>
     );
   }
@@ -138,9 +168,9 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
   return (
     <div className={styles.adminContainer}>
       <div className={styles.editHeader}>
-        <h1 className={styles.adminTitle}>Blog Yazısını Düzenle</h1>
+        <h1 className={styles.adminTitle}>{EDIT_TEXTS.TITLE.PAGE}</h1>
         <Link href="/a/0x/admin" className={styles.backLink}>
-          ← Admin Panelinə Get
+          {EDIT_TEXTS.TITLE.BACK}
         </Link>
       </div>
 
@@ -152,7 +182,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
 
       <form onSubmit={handleSubmit} className={styles.blogForm}>
         <div className={styles.formGroup}>
-          <label htmlFor="title">Başlıq</label>
+          <label htmlFor="title">{EDIT_TEXTS.FORM.FIELDS.TITLE}</label>
           <input
             type="text"
             id="title"
@@ -164,7 +194,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="excerpt">Qısa Açıqlama</label>
+          <label htmlFor="excerpt">{EDIT_TEXTS.FORM.FIELDS.EXCERPT}</label>
           <textarea
             id="excerpt"
             name="excerpt"
@@ -177,7 +207,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
 
         <div className={styles.formRow}>
           <div className={styles.formGroup}>
-            <label htmlFor="categories">Kategoriya (vergüllə ayırın)</label>
+            <label htmlFor="categories">{EDIT_TEXTS.FORM.FIELDS.CATEGORIES}</label>
             <input
               type="text"
               id="categories"
@@ -189,7 +219,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="author">Yazan</label>
+            <label htmlFor="author">{EDIT_TEXTS.FORM.FIELDS.AUTHOR}</label>
             <input
               type="text"
               id="author"
@@ -201,19 +231,19 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="content">Content</label>
+          <label htmlFor="content">{EDIT_TEXTS.FORM.FIELDS.CONTENT}</label>
           <RichTextEditor
             value={formData.content}
             onChange={handleEditorChange}
-            placeholder="Blog içeriğinizi buraya yazın..."
+            placeholder={EDIT_TEXTS.FORM.FIELDS.CONTENT_PLACEHOLDER}
           />
           <small className={styles.helpText}>
-            Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin və şəklin URL-ni daxil edin. Link əlavə etmək üçün mətni seçin və 🔗 düyməsini sıxın.
+            {EDIT_TEXTS.FORM.FIELDS.CONTENT_HELP}
           </small>
         </div>
 
         <button type="submit" className={styles.submitButton}>
-          Bloq Yazısını Yeniləyin
+          {EDIT_TEXTS.FORM.FIELDS.SUBMIT}
         </button>
       </form>
     </div>
