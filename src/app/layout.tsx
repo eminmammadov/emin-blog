@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
+import UpcomingPopUp from "@/components/UpcomingPopUp";
 import { Suspense } from "react";
 
 // Layout için statik metinler
@@ -125,7 +126,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${dmSans.variable} antialiased flex flex-col min-h-screen`}
-        data-new-gr-c-s-check-loaded="14.1233.0"
+        data-new-gr-c-s-check-loaded="14.1234.0"
         data-gr-ext-installed=""
       >
         <Suspense fallback={<div className="h-screen bg-[#F7F7F3] flex items-center justify-center">{LAYOUT_TEXTS.LOADING}</div>}>
@@ -138,6 +139,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <UpcomingPopUp />
       </body>
     </html>
   );

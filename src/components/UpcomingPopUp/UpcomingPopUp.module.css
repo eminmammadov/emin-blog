@@ -1,0 +1,136 @@
+.popupContainer {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.5s ease-in-out;
+  backdrop-filter: blur(3px);
+}
+
+.popup {
+  background-color: var(--background);
+  padding: 0;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: slideUp 0.5s ease-in-out;
+  overflow: hidden;
+  border: 1px solid var(--black);
+}
+
+.popupContent {
+  padding: 1.5rem 1.5rem 1.5rem;
+  width: 100%;
+}
+
+.imageContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--black);
+}
+
+.popupImage {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--black);
+  letter-spacing: -1px;
+}
+
+.description {
+  font-size: 1rem;
+  color: var(--gray);
+  margin-bottom: 1.5rem;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.06em;
+}
+
+.button {
+  color: var(--black);
+  border: 1px solid var(--black);
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: var(--foreground);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Mobil görünüm için */
+@media (max-width: 768px) {
+  .popupContainer {
+    align-items: flex-end;
+  }
+
+  .popup {
+    max-width: 100%;
+    width: 100%;
+    animation: slideUpMobile 0.5s ease-in-out;
+    border-radius: 0;
+  }
+
+  .imageContainer {
+    height: 160px;
+  }
+
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
