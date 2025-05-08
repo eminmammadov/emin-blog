@@ -215,6 +215,26 @@ export default function AdminPage() {
       // Blog silindikten sonra bildirimleri güncelle
       updateNotificationsAfterDelete(slug);
 
+      // Önbelleği temizlemek için API'leri yeniden çağır
+      try {
+        console.log('Refreshing blog cache after deletion...');
+
+        // Tüm blog API'lerini yeniden çağır
+        const baseUrl = process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000'
+          : process.env.NEXT_PUBLIC_SITE_URL || 'https://emin-blog.vercel.app';
+
+        // API'leri çağır
+        await fetch(`${baseUrl}/api/blogs/public`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+
+        console.log('Blog cache refreshed successfully');
+      } catch (refreshError) {
+        console.error('Error refreshing blog cache:', refreshError);
+      }
+
       setStatus({ message: ADMIN_TEXTS.STATUS.SUCCESS_DELETE, type: 'success' });
       fetchBlogs();
     } catch (error) {

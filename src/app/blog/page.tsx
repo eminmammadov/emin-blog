@@ -22,6 +22,7 @@ const BLOG_PAGE_TEXTS = {
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable caching completely
 
 export const metadata: Metadata = {
   title: BLOG_PAGE_TEXTS.META.TITLE,

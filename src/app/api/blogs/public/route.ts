@@ -31,7 +31,13 @@ export async function GET() {
     }).sort({ date: -1 });
     console.log(`Found ${blogs.length} published blogs in database`);
 
-    return NextResponse.json(blogs);
+    return NextResponse.json(blogs, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      },
+    });
   } catch (error) {
     console.error('Error fetching published blogs:', error);
     return NextResponse.json(

@@ -35,6 +35,11 @@ export default function BlogList({
   const searchParams = useSearchParams();
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>(posts);
 
+  // Update filtered posts when posts prop changes
+  useEffect(() => {
+    setFilteredPosts(posts);
+  }, [posts]);
+
   // Filter posts based on search query
   useEffect(() => {
     const query = searchParams.get('q');

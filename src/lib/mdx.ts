@@ -33,6 +33,11 @@ export async function getBlogBySlug(slug: string): Promise<BlogPost | undefined>
 
     const response = await fetch(`${baseUrl}/api/blogs/${slug}`, {
       cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     });
 
     if (!response.ok) {
@@ -65,11 +70,14 @@ export async function getAllBlogs(): Promise<BlogPost[]> {
 
     while (retries < MAX_RETRIES) {
       try {
-        // Sadece yayınlanmış blog yazılarını getir
+        // Sadece yayınlanmış blog yazılarını getir - her zaman önbelleğe almadan
         const response = await fetch(`${baseUrl}/api/blogs/public`, {
-          ...(process.env.NODE_ENV === 'production'
-            ? { next: { revalidate: 3600 } } // Revalidate every hour in production
-            : { cache: 'no-store' }) // No cache in development
+          cache: 'no-store', // Her zaman önbelleğe almadan
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
         });
 
         if (!response.ok) {

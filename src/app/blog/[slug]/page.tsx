@@ -48,6 +48,7 @@ const BLOG_POST_TEXTS = {
 
 // Force dynamic rendering for this page and disable static generation during build
 export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable caching completely
 export const generateStaticParams = process.env.NODE_ENV === 'development'
   ? undefined
   : async () => { return []; };
