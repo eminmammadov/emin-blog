@@ -133,6 +133,38 @@
   opacity: 0.9;
 }
 
+/* Scheduler styles */
+.schedulerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 20px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.radioLabel input {
+  width: auto;
+  margin-right: 5px;
+}
+
+.dateTimeInput {
+  padding: 10px;
+  border: 1px solid var(--foreground);
+  font-family: inherit;
+  font-size: 1rem;
+  width: 100%;
+}
+
 .statusMessage {
   padding: 15px;
   margin-bottom: 20px;
@@ -228,6 +260,27 @@
 
 .deleteButton:hover {
   background-color: #f5c6cb;
+}
+
+/* Blog status styles */
+.scheduledStatus {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.publishedStatus {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  font-size: 0.8rem;
 }
 
 .loading {

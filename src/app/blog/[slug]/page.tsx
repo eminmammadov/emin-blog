@@ -4,8 +4,23 @@ import styles from './blogPost.module.css';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import type { Metadata } from 'next';
-import { getFullUrl } from '@/lib/utils';
+import { getFullUrl, extractFirstImageFromContent } from '@/lib/utils';
 import ShareButtons from '@/components/ShareButtons/ShareButtons';
+
+// Özel MDX bileşenleri
+const components = {
+  // Linkleri yeni sekmede açmak için
+  a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) =>
+    <a {...props} target="_blank" rel="noopener noreferrer" />,
+
+  // Resimleri 16:9 oranında container içine yerleştirme
+  img: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
+    <span className={styles.imageContainer}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img {...props} alt={props.alt || 'Blog görseli'} />
+    </span>
+  ),
+};
 
 // Blog post sayfası için statik metinler
 const BLOG_POST_TEXTS = {
@@ -56,22 +71,34 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     }
 
     console.log(`Generated metadata for: ${post.title}`);
+
+    // Blog içeriğinden ilk resmi çıkar
+    const firstImageUrl = extractFirstImageFromContent(post.content);
+
+    // Eğer blog içeriğinde resim varsa, OG resmi olarak kullan
+    // Yoksa varsayılan OG resmini kullan
+    const ogImageUrl = firstImageUrl
+      ? (firstImageUrl.startsWith('http') ? firstImageUrl : getFullUrl(firstImageUrl))
+      : getFullUrl('/images/og-image.jpg');
+
+    console.log(`Using OG image: ${ogImageUrl} for blog: ${post.title}`);
+
     return {
       title: post.title,
       description: post.excerpt,
       authors: [{ name: post.author }],
-      keywords: [...post.categories, 'blog', 'Emin Blog'],
+      keywords: [...(post.categories || []), 'blog', 'Emin Blog'],
       openGraph: {
         title: post.title,
         description: post.excerpt,
         type: 'article',
         publishedTime: post.date,
-        authors: [post.author],
+        authors: [post.author || 'Emin Mammadov'],
         tags: post.categories,
         url: getFullUrl(`/blog/${slug}`),
         images: [
           {
-            url: getFullUrl('/images/og-image.jpg'),
+            url: ogImageUrl,
             width: 1200,
             height: 630,
             alt: post.title,
@@ -82,7 +109,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         card: 'summary_large_image',
         title: post.title,
         description: post.excerpt,
-        images: [getFullUrl('/images/og-image.jpg')],
+        images: [ogImageUrl],
       },
     };
   } catch (error) {
@@ -132,6 +159,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 <ShareButtons
                   title={post.title}
                   slug={post.slug}
+                  content={post.content}
                 />
               </div>
             </div>
@@ -140,7 +168,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           <div className={styles.articleSection}>
             <h2 className={styles.sectionTitle}>{BLOG_POST_TEXTS.SECTIONS.ARTICLE}</h2>
             <div className={styles.articleContent}>
-              <MDXRemote source={post.content} />
+              <MDXRemote source={post.content} components={components} />
               <div>
                 <Link href="/blog" className={styles.backButton}>
                   {BLOG_POST_TEXTS.BACK_BUTTON}

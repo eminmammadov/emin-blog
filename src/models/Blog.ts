@@ -10,6 +10,8 @@ export interface IBlog extends Document {
   readingTime?: string;
   category: string;
   categories: string[];
+  scheduledDate?: Date; // Yayınlanma zamanı
+  published: boolean; // Yayınlanma durumu
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +27,8 @@ const BlogSchema: Schema = new Schema(
     readingTime: { type: String },
     category: { type: String, required: true },
     categories: { type: [String], required: true },
+    scheduledDate: { type: Date }, // Yayınlanma zamanı
+    published: { type: Boolean, default: true }, // Varsayılan olarak hemen yayınla
   },
   { timestamps: true }
 );

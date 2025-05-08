@@ -22,7 +22,7 @@ export async function GET() {
   try {
     await connectDB();
 
-    // Get all blogs sorted by date (newest first)
+    // Admin paneli için tüm blogları getir (yayınlanmış ve zamanlanmış)
     const blogs = await Blog.find({}).sort({ date: -1 });
     console.log(`Found ${blogs.length} blogs in database`);
 

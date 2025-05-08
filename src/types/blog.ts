@@ -9,4 +9,6 @@ export interface BlogPost {
   readingTime?: string;
   category?: string;
   categories?: string[];
+  scheduledDate?: string | Date; // Yayınlanma zamanı
+  published?: boolean; // Yayınlanma durumu
 }

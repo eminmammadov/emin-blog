@@ -30,8 +30,14 @@ export async function GET(
     const slug = resolvedParams.slug;
     console.log(`Fetching blog with slug: ${slug}`);
 
-    // Find blog by slug
-    const blog = await Blog.findOne({ slug });
+    // Find published blog by slug
+    const blog = await Blog.findOne({
+      slug,
+      $or: [
+        { published: true }, // Yayınlanmış blog yazıları
+        { published: { $exists: false } } // Eski blog yazıları (published alanı olmayan)
+      ]
+    });
 
     if (!blog) {
       console.log(`Blog with slug ${slug} not found`);

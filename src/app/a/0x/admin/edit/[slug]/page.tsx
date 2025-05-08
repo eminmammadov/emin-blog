@@ -22,9 +22,9 @@ const EDIT_TEXTS = {
       EXCERPT: 'Qısa Açıqlama',
       CATEGORIES: 'Kategoriya (vergüllə ayırın)',
       AUTHOR: 'Yazan',
-      CONTENT: 'Content',
-      CONTENT_HELP: 'Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin və şəklin URL-ni daxil edin. Link əlavə etmək üçün mətni seçin və 🔗 düyməsini sıxın.',
-      CONTENT_PLACEHOLDER: 'Blog içeriğinizi buraya yazın...',
+      CONTENT: 'Content (Markdown)',
+      CONTENT_HELP: 'Markdown formatında yazın. Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin. Link əlavə etmək üçün 🔗 düyməsini sıxın. Başlıqlar üçün # işarəsi istifadə edin.',
+      CONTENT_PLACEHOLDER: 'Blog içeriğinizi Markdown formatında buraya yazın...',
       SUBMIT: 'Bloq Yazısını Yeniləyin'
     }
   },
@@ -37,7 +37,7 @@ const EDIT_TEXTS = {
 };
 
 // Dinamik olarak import ediyoruz çünkü bu bileşen sadece client tarafında çalışabilir
-const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+const MarkdownEditor = dynamic(() => import('@/components/MarkdownEditor'), {
   ssr: false,
   loading: () => <div className={styles.loading}>{EDIT_TEXTS.LOADING.EDITOR}</div>
 });
@@ -232,7 +232,7 @@ export default function EditBlogPage({ params }: { params: { slug: string } }) {
 
         <div className={styles.formGroup}>
           <label htmlFor="content">{EDIT_TEXTS.FORM.FIELDS.CONTENT}</label>
-          <RichTextEditor
+          <MarkdownEditor
             value={formData.content}
             onChange={handleEditorChange}
             placeholder={EDIT_TEXTS.FORM.FIELDS.CONTENT_PLACEHOLDER}

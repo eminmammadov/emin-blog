@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import Blog from '@/models/Blog';
 
@@ -70,14 +70,22 @@ export async function POST(request: NextRequest) {
     if (typeof body.categories === 'string') {
       categoriesArray = body.categories
         .split(',')
-        .map(cat => cat.trim())
-        .filter(cat => cat);
+        .map((cat: string) => cat.trim())
+        .filter((cat: string) => cat);
     }
 
     // Set the first category as the main category
     const mainCategory = Array.isArray(categoriesArray) && categoriesArray.length > 0
       ? categoriesArray[0]
       : 'Digər';
+
+    // Zamanlanmış tarih bilgisini hazırla
+    let scheduledDate = null;
+    if (body.scheduledDate) {
+      // Tarih string ise Date nesnesine çevir
+      scheduledDate = new Date(body.scheduledDate);
+      console.log(`Scheduled date for blog "${body.title}": ${scheduledDate.toISOString()}`);
+    }
 
     // Create new blog with current date
     const newBlog = await Blog.create({
@@ -90,6 +98,8 @@ export async function POST(request: NextRequest) {
       author: body.author || 'Emin Mammadov',
       readingTime: body.readingTime || `${Math.ceil(body.content.length / 1000)} min read`,
       categories: categoriesArray,
+      scheduledDate: scheduledDate, // Zamanlama bilgisi
+      published: body.published !== undefined ? body.published : true, // Yayınlanma durumu
     });
 
     console.log(`Created new blog: ${newBlog.title}`);

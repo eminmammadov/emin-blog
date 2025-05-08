@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import Blog from '@/models/Blog';
 import { generateShortLink } from '@/lib/shortLink';

@@ -1,0 +1,53 @@
+.editorContainer {
+  border: 1px solid var(--foreground);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 8px;
+  background-color: var(--foreground);
+  border-bottom: 1px solid var(--foreground);
+}
+
+.toolbar button {
+  background-color: var(--background);
+  border: 1px solid var(--foreground);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toolbar button:hover {
+  background-color: var(--hover);
+}
+
+.markdownTextarea {
+  width: 100%;
+  min-height: 300px;
+  padding: 16px;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  border: none;
+  resize: vertical;
+  outline: none;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    padding: 5px;
+  }
+
+  .toolbar button {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+  }
+}

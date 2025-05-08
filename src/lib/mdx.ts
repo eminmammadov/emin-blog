@@ -65,9 +65,11 @@ export async function getAllBlogs(): Promise<BlogPost[]> {
 
     while (retries < MAX_RETRIES) {
       try {
-        const response = await fetch(`${baseUrl}/api/blogs`, {
-          cache: process.env.NODE_ENV === 'production' ? 'force-cache' : 'no-store',
-          next: { revalidate: 3600 } // Revalidate every hour in production
+        // Sadece yayınlanmış blog yazılarını getir
+        const response = await fetch(`${baseUrl}/api/blogs/public`, {
+          ...(process.env.NODE_ENV === 'production'
+            ? { next: { revalidate: 3600 } } // Revalidate every hour in production
+            : { cache: 'no-store' }) // No cache in development
         });
 
         if (!response.ok) {

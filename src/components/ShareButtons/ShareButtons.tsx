@@ -1,15 +1,27 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from '../../app/blog/[slug]/blogPost.module.css';
 import { getShortUrl } from '@/lib/shortLink';
+import { extractFirstImageFromContent } from '@/lib/utils';
 
 interface ShareButtonsProps {
   title: string;
   slug: string;
+  content?: string; // Blog içeriği
 }
 
-export default function ShareButtons({ title, slug }: ShareButtonsProps) {
+export default function ShareButtons({ title, slug, content }: ShareButtonsProps) {
+  // Blog içeriğinden ilk resmi çıkar - bu bilgi blog post sayfasında metadata için kullanılıyor
+  useEffect(() => {
+    if (content) {
+      const firstImageUrl = extractFirstImageFromContent(content);
+      if (firstImageUrl) {
+        console.log('ShareButtons: Found image in content:', firstImageUrl);
+      }
+    }
+  }, [content]);
+
   const handleTwitterShare = () => {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://emin-blog.vercel.app';
 

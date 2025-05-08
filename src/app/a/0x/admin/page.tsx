@@ -37,9 +37,16 @@ const ADMIN_TEXTS = {
       EXCERPT: 'Qısa Açıqlama',
       CATEGORIES: 'Kateqoriya (vergüllə ayırın)',
       AUTHOR: 'Yazan',
-      CONTENT: 'Content',
-      CONTENT_HELP: 'Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin və şəklin URL-ni daxil edin. Link əlavə etmək üçün mətni seçin və 🔗 düyməsini sıxın.',
-      CONTENT_PLACEHOLDER: 'Blog içeriğinizi buraya yazın...',
+      CONTENT: 'Content (Markdown)',
+      CONTENT_HELP: 'Markdown formatında yazın. Şəkil əlavə etmək üçün 🖼️ düyməsinə klikləyin. Link əlavə etmək üçün 🔗 düyməsini sıxın. Başlıqlar üçün # işarəsi istifadə edin.',
+      CONTENT_PLACEHOLDER: 'Blog içeriğinizi Markdown formatında buraya yazın...',
+      SCHEDULER: {
+        LABEL: 'Yayınlama Zamanı',
+        HELP: 'Blog yazısını belirli bir zamanda otomatik olarak yayınlamak için tarih ve saat seçin. Boş bırakırsanız, blog yazısı hemen yayınlanacaktır.',
+        PLACEHOLDER: 'Tarih ve saat seçin',
+        PUBLISH_NOW: 'Hemen Yayınla',
+        SCHEDULE: 'Zamanla'
+      },
       SUBMIT: 'Blog Yazısını Yayınla'
     }
   },
@@ -72,7 +79,7 @@ const ADMIN_TEXTS = {
 };
 
 // Dinamik olarak import ediyoruz çünkü bu bileşen sadece client tarafında çalışabilir
-const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+const MarkdownEditor = dynamic(() => import('@/components/MarkdownEditor'), {
   ssr: false,
   loading: () => <div className={styles.loading}>{ADMIN_TEXTS.LOADING.EDITOR}</div>
 });
@@ -112,6 +119,8 @@ export default function AdminPage() {
     content: '',
     categories: '',
     author: 'Emin Mammadov',
+    scheduledDate: '', // Yayınlanma zamanı
+    publishNow: true, // Hemen yayınla
   });
 
   const [status, setStatus] = useState<{
@@ -270,6 +279,33 @@ export default function AdminPage() {
         .map(cat => cat.trim())
         .filter(cat => cat);
 
+      // Zamanlama bilgisini hazırla
+      let scheduledDateObj = null;
+      let published = true;
+
+      if (!formData.publishNow && formData.scheduledDate) {
+        // Tarih string'ini Date nesnesine çevir
+        const scheduledDate = new Date(formData.scheduledDate);
+
+        // Tarih geçerli mi kontrol et
+        const timestamp = scheduledDate.getTime();
+        if (Number.isNaN(timestamp)) {
+          throw new Error('Geçersiz tarih formatı. Lütfen geçerli bir tarih seçin.');
+        }
+
+        // Şu anki zamandan sonra mı kontrol et
+        const now = new Date();
+        if (scheduledDate <= now) {
+          throw new Error('Zamanlanmış tarih, şu anki zamandan sonra olmalıdır.');
+        }
+
+        // Zamanlanmış tarihi ISO string formatında gönder
+        scheduledDateObj = scheduledDate.toISOString();
+        console.log(`Scheduling blog "${formData.title}" for: ${scheduledDateObj}`);
+
+        published = false; // Zamanlanmış blog yazısı başlangıçta yayınlanmamış olacak
+      }
+
       const response = await fetch('/api/blogs/create', {
         method: 'POST',
         headers: {
@@ -279,6 +315,8 @@ export default function AdminPage() {
         body: JSON.stringify({
           ...formData,
           categories: categoriesArray,
+          scheduledDate: scheduledDateObj,
+          published: published,
         }),
       });
 
@@ -299,6 +337,8 @@ export default function AdminPage() {
         content: '',
         categories: '',
         author: 'Emin Mammadov',
+        scheduledDate: '',
+        publishNow: true,
       });
 
       // Refresh bloq list if we're in list view
@@ -433,13 +473,54 @@ export default function AdminPage() {
 
         <div className={styles.formGroup}>
           <label htmlFor="content">{ADMIN_TEXTS.FORM.FIELDS.CONTENT}</label>
-          <RichTextEditor
+          <MarkdownEditor
             value={formData.content}
             onChange={handleEditorChange}
             placeholder={ADMIN_TEXTS.FORM.FIELDS.CONTENT_PLACEHOLDER}
           />
           <small className={styles.helpText}>
             {ADMIN_TEXTS.FORM.FIELDS.CONTENT_HELP}
+          </small>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="schedulerOptions">{ADMIN_TEXTS.FORM.FIELDS.SCHEDULER.LABEL}</label>
+          <div id="schedulerOptions" className={styles.schedulerContainer}>
+            <div className={styles.radioGroup}>
+              <label className={styles.radioLabel}>
+                <input
+                  type="radio"
+                  name="publishNow"
+                  checked={formData.publishNow}
+                  onChange={() => setFormData(prev => ({ ...prev, publishNow: true }))}
+                />
+                {ADMIN_TEXTS.FORM.FIELDS.SCHEDULER.PUBLISH_NOW}
+              </label>
+              <label className={styles.radioLabel}>
+                <input
+                  type="radio"
+                  name="publishNow"
+                  checked={!formData.publishNow}
+                  onChange={() => setFormData(prev => ({ ...prev, publishNow: false }))}
+                />
+                {ADMIN_TEXTS.FORM.FIELDS.SCHEDULER.SCHEDULE}
+              </label>
+            </div>
+            {!formData.publishNow && (
+              <input
+                type="datetime-local"
+                id="scheduledDate"
+                name="scheduledDate"
+                value={formData.scheduledDate}
+                onChange={handleChange}
+                className={styles.dateTimeInput}
+                placeholder={ADMIN_TEXTS.FORM.FIELDS.SCHEDULER.PLACEHOLDER}
+                min={new Date().toISOString().slice(0, 16)}
+              />
+            )}
+          </div>
+          <small className={styles.helpText}>
+            {ADMIN_TEXTS.FORM.FIELDS.SCHEDULER.HELP}
           </small>
         </div>
 
@@ -466,32 +547,57 @@ export default function AdminPage() {
                     <th>{ADMIN_TEXTS.BLOG_LIST.TABLE.TITLE}</th>
                     <th>{ADMIN_TEXTS.BLOG_LIST.TABLE.DATE}</th>
                     <th>{ADMIN_TEXTS.BLOG_LIST.TABLE.CATEGORY}</th>
+                    <th>Durum</th>
                     <th>{ADMIN_TEXTS.BLOG_LIST.TABLE.ACTIONS}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {blogs.map((blog) => (
-                    <tr key={blog.slug || blog._id}>
-                      <td>{blog.title || 'Başlıksız'}</td>
-                      <td>{blog.date || 'Tarih yok'}</td>
-                      <td>{blog.category || (blog.categories && blog.categories.length > 0 ? blog.categories[0] : 'Kategori yok')}</td>
-                      <td className={styles.actions}>
-                        <Link href={`/blog/${blog.slug}`} target="_blank" className={styles.viewButton}>
-                          {ADMIN_TEXTS.BLOG_LIST.ACTIONS.VIEW}
-                        </Link>
-                        <Link href={`/a/0x/admin/edit/${blog.slug}`} className={styles.editButton}>
-                          {ADMIN_TEXTS.BLOG_LIST.ACTIONS.EDIT}
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => deleteBlog(blog.slug)}
-                          className={styles.deleteButton}
-                        >
-                          {ADMIN_TEXTS.BLOG_LIST.ACTIONS.DELETE}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {blogs.map((blog) => {
+                    // Zamanlanmış blog yazısı için durum bilgisi
+                    const isScheduled = blog.scheduledDate && !blog.published;
+                    const scheduledDate = isScheduled && blog.scheduledDate ? new Date(blog.scheduledDate as string | Date) : null;
+                    const isScheduledInFuture = scheduledDate && scheduledDate > new Date();
+
+                    return (
+                      <tr key={blog.slug || blog._id}>
+                        <td>{blog.title || 'Başlıksız'}</td>
+                        <td>{blog.date || 'Tarih yok'}</td>
+                        <td>{blog.category || (blog.categories && blog.categories.length > 0 ? blog.categories[0] : 'Kategori yok')}</td>
+                        <td>
+                          {isScheduled ? (
+                            <span className={styles.scheduledStatus}>
+                              {isScheduledInFuture ? (
+                                <>
+                                  Zamanlandı: {scheduledDate?.toLocaleDateString()} {scheduledDate?.toLocaleTimeString()}
+                                </>
+                              ) : (
+                                <>Zamanı geçmiş</>
+                              )}
+                            </span>
+                          ) : (
+                            <span className={styles.publishedStatus}>Yayında</span>
+                          )}
+                        </td>
+                        <td className={styles.actions}>
+                          {blog.published && (
+                            <Link href={`/blog/${blog.slug}`} target="_blank" className={styles.viewButton}>
+                              {ADMIN_TEXTS.BLOG_LIST.ACTIONS.VIEW}
+                            </Link>
+                          )}
+                          <Link href={`/a/0x/admin/edit/${blog.slug}`} className={styles.editButton}>
+                            {ADMIN_TEXTS.BLOG_LIST.ACTIONS.EDIT}
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => deleteBlog(blog.slug)}
+                            className={styles.deleteButton}
+                          >
+                            {ADMIN_TEXTS.BLOG_LIST.ACTIONS.DELETE}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

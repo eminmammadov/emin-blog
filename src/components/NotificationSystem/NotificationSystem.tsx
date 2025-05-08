@@ -39,6 +39,8 @@ export type BlogPostType = {
   readingTime?: string;
   category?: string;
   categories?: string[];
+  scheduledDate?: string | Date; // Yayınlanma zamanı
+  published?: boolean; // Yayınlanma durumu
 };
 
 // Define notification type
@@ -183,8 +185,8 @@ export default function NotificationSystem({ className }: NotificationSystemProp
   // Fetch blog posts and create notifications
   const fetchBlogPosts = useCallback(async () => {
     try {
-      // Fetch blog posts from API with cache disabled
-      const response = await fetch('/api/blogs', {
+      // Sadece yayınlanmış blog yazılarını getir
+      const response = await fetch('/api/blogs/public', {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -225,6 +227,15 @@ export default function NotificationSystem({ className }: NotificationSystemProp
       const newPosts = blogPosts.filter((post: BlogPostType) => {
         const postId = post._id || post.slug;
         const postDate = new Date(post.date);
+
+        // Sadece yayınlanmış blog yazılarını kontrol et
+        // published alanı undefined ise (eski blog yazıları için), true kabul et
+        const isPublished = post.published === undefined || post.published === true;
+
+        if (!isPublished) {
+          console.log(`Skipping scheduled post: ${post.title}`);
+          return false;
+        }
 
         // ID mevcut bildirimlerde yoksa VEYA son ziyaretten sonra yayınlanmışsa
         const isNew = !existingNotificationIds.includes(postId) || postDate > lastVisitDate;
@@ -327,8 +338,8 @@ export default function NotificationSystem({ className }: NotificationSystemProp
       // Doğrudan API'den blog yazılarını al
       const fetchDirectFromAPI = async () => {
         try {
-          // Cache'i devre dışı bırakmak için no-cache ve no-store parametrelerini ekleyelim
-          const response = await fetch('/api/blogs', {
+          // Sadece yayınlanmış blog yazılarını getir
+          const response = await fetch('/api/blogs/public', {
             cache: 'no-store',
             headers: {
               'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -366,6 +377,15 @@ export default function NotificationSystem({ className }: NotificationSystemProp
             const newPosts = blogPosts.filter((post: BlogPostType) => {
               const postId = post._id || post.slug;
               const postDate = new Date(post.date);
+
+              // Sadece yayınlanmış blog yazılarını kontrol et
+              // published alanı undefined ise (eski blog yazıları için), true kabul et
+              const isPublished = post.published === undefined || post.published === true;
+
+              if (!isPublished) {
+                console.log(`Skipping scheduled post: ${post.title}`);
+                return false;
+              }
 
               // ID mevcut bildirimlerde yoksa VEYA son ziyaretten sonra yayınlanmışsa
               const isNew = !existingNotificationIds.includes(postId) || postDate > lastVisitDate;

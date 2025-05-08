@@ -24,10 +24,57 @@ const BASIC_AUTH_CREDENTIAL = Buffer.from(`${ADMIN_USERNAME}:${ADMIN_PASSWORD}`)
 
 console.log('Expected credential:', BASIC_AUTH_CREDENTIAL);
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   console.log(`Middleware processing path: ${pathname}`);
+
+  // Sadece ana sayfa için zamanlanmış blog yazılarını kontrol et
+  if (pathname === '/') {
+    // Sadece belirli aralıklarla kontrol et (her 1 dakikada bir)
+    const now = Date.now();
+    const lastCheck = Number.parseInt(request.cookies.get('last_scheduled_check')?.value || '0', 10);
+
+    // 1 dakikadan fazla zaman geçtiyse kontrol et
+    if (now - lastCheck > 1 * 60 * 1000) {
+      try {
+        console.log('Checking scheduled blog posts...');
+
+        // Zamanlanmış blog yazılarını kontrol et
+        const baseUrl = process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000'
+          : process.env.NEXT_PUBLIC_SITE_URL || 'https://emin-blog.vercel.app';
+
+        // API'yi çağır
+        const checkResponse = await fetch(`${baseUrl}/api/blogs/publish-scheduled`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (checkResponse.ok) {
+          const result = await checkResponse.json();
+          if (result.publishedBlogs && result.publishedBlogs.length > 0) {
+            console.log(`Published ${result.publishedBlogs.length} scheduled blog posts:`, result.publishedBlogs);
+          } else {
+            console.log('No scheduled blog posts to publish');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking scheduled posts in middleware:', error);
+      }
+
+      // Son kontrol zamanını güncelle
+      const response = NextResponse.next();
+      response.cookies.set('last_scheduled_check', now.toString(), {
+        maxAge: 60 * 60 * 24, // 1 gün
+        path: '/',
+      });
+
+      return response;
+    }
+  }
 
   // Admin səhifələri üçün identifikasiya
   if (pathname === '/a/0x/admin' || pathname.startsWith('/a/0x/admin/')) {
@@ -113,8 +160,18 @@ export function middleware(request: NextRequest) {
 // Middleware-in işləyəcəyi path-lər
 export const config = {
   matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api/blogs/publish-scheduled (zamanlanmış blog yazılarını yayınlama API'si)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api/blogs/publish-scheduled|_next/static|_next/image|favicon.ico).*)',
     '/a/0x/admin/:path*',
     '/a/0x/admin',
-    '/api/blogs/:path*',
+    '/api/blogs/create/:path*',
+    '/api/blogs/delete/:path*',
+    '/api/blogs/update/:path*',
   ],
 };

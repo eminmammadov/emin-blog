@@ -55,7 +55,11 @@ export default async function BlogPage() {
 
     return (
       <main>
-        <Suspense fallback={<div>{BLOG_PAGE_TEXTS.LOADING}</div>}>
+        <Suspense fallback={
+          <div className="flex items-center justify-center">
+            {BLOG_PAGE_TEXTS.LOADING}
+          </div>
+          }>
           <BlogList
             posts={allPosts}
             title={BLOG_PAGE_TEXTS.BLOG_LIST_TITLE}
